@@ -22,8 +22,8 @@ namespace MyChickenMod.Custom.Chicken
         {
             new ItemGroup.ItemSet()
             {
-                Max = 2,
-                Min = 2,
+                Max = 1,
+                Min = 1,
                 Items = new List<Item>()
                 {
                     (Item) GDOUtils.GetExistingGDO(ItemReferences.Plate)
