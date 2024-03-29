@@ -17,8 +17,6 @@ namespace MyChickenMod.Custom.Chicken
         public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
         public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
-
-        public virtual string ColourBlindTag => "C";
         
         public virtual List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
         {
