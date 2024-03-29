@@ -12,7 +12,7 @@ namespace MyChickenMod.Custom.Chicken
     {
         public override string UniqueNameID => nameof(MyChicken_Plated);
 
-        public virtual GameObject Prefab => Mod.Bundle.LoadAsset<GameObject>("Chicken - Plated");
+        public virtual GameObject Prefab => ((Item)GDOUtils.GetExistingGDO(ItemReferences.Apple)).Prefab;
 
         public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
@@ -36,7 +36,7 @@ namespace MyChickenMod.Custom.Chicken
 
         public virtual void OnRegister(ItemGroup gameDataObject)
         {
-            MaterialUtils.ApplyMaterial(gameDataObject.Prefab, "Plate/Plate/Cylinder", new Material[2]);
+            // MaterialUtils.ApplyMaterial(gameDataObject.Prefab, "Plate/Plate/Cylinder", new Material[2]);
         }
     }
 }
