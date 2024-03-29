@@ -2,6 +2,7 @@
 using KitchenLib.Customs;
 using KitchenLib.Utils;
 using System.Collections.Generic;
+using IngredientLib.Ingredient.Items;
 using KitchenLib.References;
 using UnityEngine;
 
@@ -29,6 +30,15 @@ namespace MyChickenMod.Custom.Chicken
                     (Item) GDOUtils.GetExistingGDO(ItemReferences.Plate)
                 },
                 IsMandatory = true,
+            },
+            new ItemGroup.ItemSet()
+            {
+                Max = 1,
+                Min = 1,
+                Items = new List<Item>()
+                {
+                    (Item) GDOUtils.GetCustomGameDataObject<CookedChicken>().GameDataObject
+                },
             }
         };
 
