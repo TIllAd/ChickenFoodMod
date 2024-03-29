@@ -18,7 +18,7 @@ namespace MyChickenMod.Custom.Chicken
         public override Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
         public override Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
-        
+
         public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
         {
             new ItemGroup.ItemSet()
@@ -48,5 +48,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             // MaterialUtils.ApplyMaterial(gameDataObject.Prefab, "Plate/Plate/Cylinder", new Material[2]);
         }
+
+       
     }
 }

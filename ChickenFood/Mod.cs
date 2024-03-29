@@ -38,5 +38,21 @@ namespace MyChickenMod
             AddGameDataObject<MyChicken_Plated>();
             AddGameDataObject<MyChicken_Plated_Dish>();
         }
+
+
+        public static void LogInfo(string _log) => Debug.Log((object)("ChickenMod" + _log));
+
+        public static void LogWarning(string _log) => Debug.LogWarning((object)("ChickenMod " + _log));
+
+        public static void LogError(string _log) => Debug.LogError((object)("ChickenMod " + _log));
+
+        public static void LogInfo(object _log) => Mod.LogInfo(_log.ToString());
+
+        public static void LogWarning(object _log) => Mod.LogWarning(_log.ToString());
+
+        public static void LogError(object _log) => Mod.LogError(_log.ToString());
     }
+
+
 }
+
