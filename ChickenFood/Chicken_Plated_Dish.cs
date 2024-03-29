@@ -15,11 +15,7 @@ namespace MyChickenMod.Custom.Chicken
 
         public override DishType Type => DishType.Main;
 
-        public virtual bool IsSpecificFranchiseTier => false;
-
         public virtual UnlockGroup UnlockGroup => UnlockGroup.Dish;
-
-        public virtual int MinimumFranchiseTier => 0;
 
         public override int Difficulty => 1;
 

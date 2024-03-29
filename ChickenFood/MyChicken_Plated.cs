@@ -14,13 +14,9 @@ namespace MyChickenMod.Custom.Chicken
 
         public virtual GameObject prefab => Mod.Bundle.LoadAsset<GameObject>("Chicken - Plated");
 
-        public virtual bool AutoCollapsing => false;
-
         public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
         public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
-
-        public virtual bool CanContainSide => false;
 
         public virtual string ColourBlindTag => "C";
         
