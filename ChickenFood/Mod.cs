@@ -38,7 +38,6 @@ namespace MyChickenMod
             // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
-            List<AssetBundleModPack> packs = mod.GetPacks<AssetBundleModPack>();
             AddGameDataObject<MyChicken_Plated>();
             AddGameDataObject<MyChicken_Plated_Dish>();
         }
