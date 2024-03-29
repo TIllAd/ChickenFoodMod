@@ -35,7 +35,7 @@ namespace MyChickenMod
 
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
-            Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
+            // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
             List<AssetBundleModPack> packs = mod.GetPacks<AssetBundleModPack>();
