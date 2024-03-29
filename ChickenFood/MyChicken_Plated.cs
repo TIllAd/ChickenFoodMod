@@ -1,12 +1,9 @@
-﻿using IngredientLib.Ingredient.Items;
-using KitchenData;
+﻿using KitchenData;
 using KitchenLib.Customs;
 using KitchenLib.Utils;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using IngredientLib.Ingredient.Items;
+using KitchenLib.References;
 using UnityEngine;
 
 namespace MyChickenMod.Custom.Chicken
@@ -16,52 +13,40 @@ namespace MyChickenMod.Custom.Chicken
     {
         public override string UniqueNameID => nameof(MyChicken_Plated);
 
-   
+        public override GameObject Prefab => ((Item)GDOUtils.GetExistingGDO(ItemReferences.Apple)).Prefab;
 
-        public virtual GameObject prefab => Mod.Bundle.LoadAsset<GameObject>("Chicken - Plated");
+        public override Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
-        public virtual bool AutoCollapsing => false;
-
-        public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(1517992271);
-
-        public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(793377380);
-
-        public virtual bool CanContainSide => false;
-
-        public virtual string ColourBlindTag => "C";
-
-
-        public virtual List<ItemGroup.ItemSet> Sets
+        public override Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
+        
+        public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
         {
-
-            get
+            new ItemGroup.ItemSet()
             {
-                return new List<ItemGroup.ItemSet>()
+                Max = 1,
+                Min = 1,
+                Items = new List<Item>()
                 {
-                    new ItemGroup.ItemSet()
-                    {
-                        Max = 2,
-                        Min = 2,
-                        Items = new List<Item>()
-                        {
-                            //(Item) GDOUtils.GetCustomGameDataObject<Chicken>().GameDataObject,
-                            (Item) GDOUtils.GetExistingGDO(793377380)
-                        },
-                        OrderingOnly = false,
-                        IsMandatory = true,
-                        RequiresUnlock = false
-                    }
-                };
+                    (Item) GDOUtils.GetExistingGDO(ItemReferences.Plate)
+                },
+                IsMandatory = true,
+            },
+            new ItemGroup.ItemSet()
+            {
+                Max = 1,
+                Min = 1,
+                Items = new List<Item>()
+                {
+                    (Item) GDOUtils.GetCustomGameDataObject<CookedChicken>().GameDataObject
+                },
             }
-        }
+        };
 
-        public virtual ItemValue ItemValue => (ItemValue) 7;
+        public override ItemValue ItemValue => ItemValue.Small;
 
-        public virtual void OnRegister(GameDataObject gameDataObject)
+        public override void OnRegister(ItemGroup gameDataObject)
         {
-            ItemGroup itemGroup = (ItemGroup)gameDataObject;
-            MaterialUtils.ApplyMaterial(((Item)itemGroup).Prefab, "Plate/Plate/Cylinder", new Material[2]);
-
+            // MaterialUtils.ApplyMaterial(gameDataObject.Prefab, "Plate/Plate/Cylinder", new Material[2]);
         }
     }
 }

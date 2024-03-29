@@ -1,45 +1,9 @@
-using IngredientLib.Ingredient.Items;
-using IngredientLib.Ingredient.Providers;
 using KitchenLib;
 using KitchenLib.Logging;
-using KitchenLib.Logging.Exceptions;
 using KitchenMods;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using KitchenLib.Customs;
-using MyChickenMod.Custom;
-using KitchenLib.Event;
 using MyChickenMod.Custom.Chicken;
-using KitchenData;
-using KitchenLib.Utils;
-using System;
-using System.Text;
-using IngredientLib.Ingredient.Items;
-using IngredientLib.Ingredient.Providers;
-using KitchenLib;
-using KitchenLib.Logging;
-using KitchenLib.Logging.Exceptions;
-using KitchenMods;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
-using KitchenLib.Customs;
-using MyChickenMod.Custom;
-using KitchenLib.Event;
-using System.Web.UI.WebControls;
-using KitchenLib.Registry;
-using Unity.Entities;
-using KitchenLib.References;
-
-using ApplianceLib.Api.References;
-
-using System;
-
-
-
 
 namespace MyChickenMod
 {
@@ -53,9 +17,6 @@ namespace MyChickenMod
 
         public static AssetBundle Bundle;
         public static KitchenLogger Logger;
-
-
-        public static CustomDish Chicken;
 
         public Mod() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
@@ -71,22 +32,11 @@ namespace MyChickenMod
 
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
-            Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
+            // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
-            List<AssetBundleModPack> packs = mod.GetPacks<AssetBundleModPack>();
-            //Mod.bundle = Mod.bundle = packs.SelectMany<AssetBundleModPack, AssetBundle>((Func<AssetBundleModPack, IEnumerable<AssetBundle>>)(e => (IEnumerable<AssetBundle>)e.AssetBundles)).ToList<AssetBundle>()[0];
-            this.AddGameDataObject<MyChicken_Plated>();
-            
-            Mod.Chicken = (CustomDish)this.AddGameDataObject<MyChicken_Plated_Dish>();
-            //Events.BuildGameDataEvent += (EventHandler<BuildGameDataEventArgs>)((s, args) => ModRegistry.HandleBuildGameDataEvent(args));
-            //this.AddGameDataObject<MyChickenMod.Custom.MyChicken_Plated>();
-            // Events.BuildGameDataEvent += (EventHandler<BuildGameDataEventArgs>)((s, args) => ModRegistry.HandleBuildGameDataEvent(args));
-
-
-
-
-            // Mod.Chicken = (CustomDish) this.AddGameDataObject<Chicken> 
+            AddGameDataObject<MyChicken_Plated>();
+            AddGameDataObject<MyChicken_Plated_Dish>();
         }
     }
 }
