@@ -2,6 +2,7 @@
 using KitchenLib.Customs;
 using KitchenLib.Utils;
 using System.Collections.Generic;
+using KitchenLib.References;
 using UnityEngine;
 
 namespace MyChickenMod.Custom.Chicken
@@ -15,9 +16,9 @@ namespace MyChickenMod.Custom.Chicken
 
         public virtual bool AutoCollapsing => false;
 
-        public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(1517992271);
+        public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
-        public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(793377380);
+        public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
 
         public virtual bool CanContainSide => false;
 
@@ -31,7 +32,7 @@ namespace MyChickenMod.Custom.Chicken
                 Min = 2,
                 Items = new List<Item>()
                 {
-                    (Item) GDOUtils.GetExistingGDO(793377380)
+                    (Item) GDOUtils.GetExistingGDO(ItemReferences.Plate)
                 },
                 OrderingOnly = false,
                 IsMandatory = true,
