@@ -40,7 +40,7 @@ namespace MyChickenMod.Custom.Chicken
             }
         };
 
-        public virtual ItemValue ItemValue => (ItemValue) 7;
+        public virtual ItemValue ItemValue => ItemValue.Small;
 
         public virtual void OnRegister(GameDataObject gameDataObject)
         {
