@@ -17,7 +17,7 @@ namespace MyChickenMod.Custom.Chicken
 
         public virtual bool IsSpecificFranchiseTier => false;
 
-        public virtual UnlockGroup UnlockGroup => (UnlockGroup)1;
+        public virtual UnlockGroup UnlockGroup => UnlockGroup.Dish;
 
         public virtual int MinimumFranchiseTier => 0;
 
