@@ -20,13 +20,11 @@ namespace MyChickenMod.Custom.Chicken
         public override int Difficulty => 1;
 
         public virtual DishCustomerChange CustomerMultiplier => (DishCustomerChange)3;
-
-
-        public virtual List<string> StartingNameSet
+        
+        public virtual List<string> StartingNameSet=> new List<string>()
         {
-            get => new List<string>() { "Chicken" };
-
-        }
+            "Chicken"
+        };
 
         public virtual HashSet<Item> MinimumIngredients => new HashSet<Item>
         {
