@@ -30,9 +30,7 @@ namespace MyChickenMod.Custom.Chicken
                 {
                     (Item) GDOUtils.GetExistingGDO(ItemReferences.Plate)
                 },
-                OrderingOnly = false,
                 IsMandatory = true,
-                RequiresUnlock = false
             }
         };
 
