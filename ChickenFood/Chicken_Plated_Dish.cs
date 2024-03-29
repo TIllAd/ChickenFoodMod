@@ -15,18 +15,18 @@ namespace MyChickenMod.Custom.Chicken
 
         public override DishType Type => DishType.Main;
 
-        public virtual UnlockGroup UnlockGroup => UnlockGroup.Dish;
+        public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
 
         public override int Difficulty => 1;
 
-        public virtual DishCustomerChange CustomerMultiplier => (DishCustomerChange)3;
+        public override DishCustomerChange CustomerMultiplier => (DishCustomerChange)3;
         
-        public virtual List<string> StartingNameSet=> new List<string>()
+        public override List<string> StartingNameSet=> new List<string>()
         {
             "Chicken"
         };
 
-        public virtual HashSet<Item> MinimumIngredients => new HashSet<Item>
+        public override HashSet<Item> MinimumIngredients => new HashSet<Item>
         {
             (Item) GDOUtils.GetCustomGameDataObject<IngredientLib.Ingredient.Items.Chicken>().GameDataObject
         };
@@ -36,7 +36,7 @@ namespace MyChickenMod.Custom.Chicken
             (Process)GDOUtils.GetExistingGDO(ProcessReferences.RequireOven)
         };
 
-        public virtual List<Dish.MenuItem> ResultingMenuItems => new List<Dish.MenuItem>()
+        public override List<Dish.MenuItem> ResultingMenuItems => new List<Dish.MenuItem>()
         {
             new Dish.MenuItem()
             {

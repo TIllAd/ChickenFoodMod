@@ -13,13 +13,13 @@ namespace MyChickenMod.Custom.Chicken
     {
         public override string UniqueNameID => nameof(MyChicken_Plated);
 
-        public virtual GameObject Prefab => ((Item)GDOUtils.GetExistingGDO(ItemReferences.Apple)).Prefab;
+        public override GameObject Prefab => ((Item)GDOUtils.GetExistingGDO(ItemReferences.Apple)).Prefab;
 
-        public virtual Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
+        public override Item DirtiesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.PlateDirty);
 
-        public virtual Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
+        public override Item DisposesTo => (Item)GDOUtils.GetExistingGDO(ItemReferences.Plate);
         
-        public virtual List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
+        public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
         {
             new ItemGroup.ItemSet()
             {
@@ -42,9 +42,9 @@ namespace MyChickenMod.Custom.Chicken
             }
         };
 
-        public virtual ItemValue ItemValue => ItemValue.Small;
+        public override ItemValue ItemValue => ItemValue.Small;
 
-        public virtual void OnRegister(ItemGroup gameDataObject)
+        public override void OnRegister(ItemGroup gameDataObject)
         {
             // MaterialUtils.ApplyMaterial(gameDataObject.Prefab, "Plate/Plate/Cylinder", new Material[2]);
         }
