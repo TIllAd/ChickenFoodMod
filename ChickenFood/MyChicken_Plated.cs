@@ -1,12 +1,7 @@
-﻿using IngredientLib.Ingredient.Items;
-using KitchenData;
+﻿using KitchenData;
 using KitchenLib.Customs;
 using KitchenLib.Utils;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MyChickenMod.Custom.Chicken
@@ -15,8 +10,6 @@ namespace MyChickenMod.Custom.Chicken
     public class MyChicken_Plated : CustomItemGroup
     {
         public override string UniqueNameID => nameof(MyChicken_Plated);
-
-   
 
         public virtual GameObject prefab => Mod.Bundle.LoadAsset<GameObject>("Chicken - Plated");
 
@@ -29,31 +22,22 @@ namespace MyChickenMod.Custom.Chicken
         public virtual bool CanContainSide => false;
 
         public virtual string ColourBlindTag => "C";
-
-
-        public virtual List<ItemGroup.ItemSet> Sets
+        
+        public virtual List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>()
         {
-
-            get
+            new ItemGroup.ItemSet()
             {
-                return new List<ItemGroup.ItemSet>()
+                Max = 2,
+                Min = 2,
+                Items = new List<Item>()
                 {
-                    new ItemGroup.ItemSet()
-                    {
-                        Max = 2,
-                        Min = 2,
-                        Items = new List<Item>()
-                        {
-                            //(Item) GDOUtils.GetCustomGameDataObject<Chicken>().GameDataObject,
-                            (Item) GDOUtils.GetExistingGDO(793377380)
-                        },
-                        OrderingOnly = false,
-                        IsMandatory = true,
-                        RequiresUnlock = false
-                    }
-                };
+                    (Item) GDOUtils.GetExistingGDO(793377380)
+                },
+                OrderingOnly = false,
+                IsMandatory = true,
+                RequiresUnlock = false
             }
-        }
+        };
 
         public virtual ItemValue ItemValue => (ItemValue) 7;
 
@@ -61,7 +45,6 @@ namespace MyChickenMod.Custom.Chicken
         {
             ItemGroup itemGroup = (ItemGroup)gameDataObject;
             MaterialUtils.ApplyMaterial(((Item)itemGroup).Prefab, "Plate/Plate/Cylinder", new Material[2]);
-
         }
     }
 }
