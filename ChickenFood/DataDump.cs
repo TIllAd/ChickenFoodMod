@@ -96,6 +96,11 @@ namespace MyChickenMod
         {
             var sb = new StringBuilder();
             var comps = string.Join(",", t.GetComponents<Component>().Where(c => c != null && !(c is Transform)).Select(c => c.GetType().Name));
+            var r = t.GetComponent<MeshRenderer>();
+            var mf = t.GetComponent<MeshFilter>();
+            if (r != null)
+                comps += " mats=" + string.Join("/", r.sharedMaterials.Select(m => m == null ? "null" : m.name))
+                       + (mf != null && mf.sharedMesh != null ? $" mesh={mf.sharedMesh.name} size={mf.sharedMesh.bounds.size}" : "");
             sb.AppendLine($"{indent}{t.name} pos={t.localPosition} scale={t.localScale} [{comps}]");
             foreach (Transform c in t)
                 sb.Append(Hierarchy(c, indent + "  "));

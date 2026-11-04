@@ -47,6 +47,7 @@ namespace MyChickenMod.Custom.Rice
                     _water.transform.localScale = new Vector3(0.6f, 0.1f, 0.6f);
                     _rice = PrefabUtil.CloneVisual(Ref(ItemReferences.Rice).Prefab, _prefab.transform, "Rice",
                         new Vector3(0f, 0.12f, 0f), 0.9f);
+                    RemoveBowl(_rice);
                 }
                 return _prefab;
             }
@@ -63,6 +64,14 @@ namespace MyChickenMod.Custom.Rice
         }
 
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
+
+        // Das Reis-Modell des Spiels bringt eine Holzschüssel mit (Kind "Cylinder", Material "Wood 1").
+        // Im Topf ergibt die keinen Sinn -> entfernen.
+        internal static void RemoveBowl(GameObject rice)
+        {
+            var bowl = rice.transform.Find("Cylinder");
+            if (bowl != null) Object.DestroyImmediate(bowl.gameObject);
+        }
     }
 
     // Gekochter Reistopf: 5 Portionen. Portion = der Reis-Haufen aus dem Spiel ("Rice - Container Cooked").
@@ -92,6 +101,7 @@ namespace MyChickenMod.Custom.Rice
                     PrefabUtil.CloneVisual(pot.transform.Find("Pot").gameObject, _prefab.transform, "Pot", Vector3.zero);
                     var rice = PrefabUtil.CloneVisual(Ref(ItemReferences.RiceContainerCooked).Prefab, _prefab.transform, "Rice",
                         RiceFull, 1.4f);
+                    RicePot.RemoveBowl(rice);
 
                     // Reis sinkt im Topf ab, je mehr Portionen entnommen werden (wie bei Suppe).
                     var view = _prefab.AddComponent<PositionSplittableView>();
