@@ -25,10 +25,9 @@ namespace MyChickenMod.Custom.Chicken
 
         public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>
         {
-            // Teller + Reis ist die Pflicht-Basis (wie beim Wok-Gericht): ohne Reis keine Toppings.
-            new ItemGroup.ItemSet { Min = 2, Max = 2, IsMandatory = true,
-                Items = new List<Item> { Ref(ItemReferences.Plate), Ref(ItemReferences.RiceContainerCooked) } },
+            new ItemGroup.ItemSet { Min = 1, Max = 1, IsMandatory = true, Items = new List<Item> { Ref(ItemReferences.Plate) } },
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { ChickenItem } },
+            new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { Ref(ItemReferences.RiceContainerCooked) } },
             // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
             // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
@@ -112,49 +111,5 @@ namespace MyChickenMod.Custom.Chicken
             }
         }
         protected override CustomGameDataObject ChickenCustom => GDOUtils.GetCustomGameDataObject<ShreddedChicken>();
-    }
-
-    // Zwischenschritt: nur Hähnchen auf dem Teller (wird nie bestellt).
-    // Damit kann man mit dem Hähnchen anfangen; mit Reis wird daraus das fertige Gericht.
-    public class ChickenOnPlate : CustomItemGroup
-    {
-        public override string UniqueNameID => "ChickenOnPlate";
-        private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
-        private static CustomGameDataObject Cooked => GDOUtils.GetCustomGameDataObject<CookedChicken>();
-        private static CustomGameDataObject Shredded => GDOUtils.GetCustomGameDataObject<ShreddedChicken>();
-
-        public override Item DirtiesTo => Ref(ItemReferences.PlateDirty);
-        public override Item DisposesTo => Ref(ItemReferences.Plate);
-
-        public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>
-        {
-            new ItemGroup.ItemSet { Min = 1, Max = 1, IsMandatory = true, Items = new List<Item> { Ref(ItemReferences.Plate) } },
-            new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { (Item)Cooked.GameDataObject, (Item)Shredded.GameDataObject } },
-        };
-
-        private GameObject _prefab;
-        public override GameObject Prefab
-        {
-            get
-            {
-                if (_prefab == null)
-                {
-                    _prefab = PrefabUtil.CreateRoot("Chicken On Plate");
-                    PrefabUtil.CloneVisual(Ref(ItemReferences.Plate).Prefab, _prefab.transform, "Plate", Vector3.zero);
-                }
-                return _prefab;
-            }
-        }
-
-        public override void OnRegister(ItemGroup gdo)
-        {
-            var cookedGO = PrefabUtil.AddChicken(Prefab.transform, Cooked);
-            var shreddedGO = PrefabUtil.AddChicken(Prefab.transform, Shredded);
-            Prefab.GetComponent<ItemGroupView>().ComponentGroups = new List<ItemGroupView.ComponentGroup>
-            {
-                new ItemGroupView.ComponentGroup { Item = (Item)Cooked.GameDataObject, GameObject = cookedGO },
-                new ItemGroupView.ComponentGroup { Item = (Item)Shredded.GameDataObject, GameObject = shreddedGO },
-            };
-        }
     }
 }
