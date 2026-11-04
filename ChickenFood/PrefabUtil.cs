@@ -53,8 +53,11 @@ namespace MyChickenMod
             foreach (var col in clone.GetComponentsInChildren<Collider>(true))
                 Object.DestroyImmediate(col);
             clone.transform.localPosition = localPosition;
-            clone.transform.localRotation = Quaternion.identity;
-            clone.transform.localScale = Vector3.one * scale;
+            // Bei Teilstücken eines Prefabs (z.B. Topf, Wasser) Drehung und Größe des Originals behalten,
+            // sonst liegen sie schief. Ganze Item-Prefabs (Wurzel) werden wie bisher neutral platziert.
+            bool isChildPart = source.transform.parent != null;
+            clone.transform.localRotation = isChildPart ? source.transform.localRotation : Quaternion.identity;
+            clone.transform.localScale = (isChildPart ? source.transform.localScale : Vector3.one) * scale;
             clone.SetActive(true);
             return clone;
         }
