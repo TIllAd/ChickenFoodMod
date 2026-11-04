@@ -1,0 +1,33 @@
+[h1]Chicken & Rice[/h1]
+A new main dish for PlateUp!: cook chicken, boil a pot of rice and plate them up together.
+
+[h2]How it works[/h2]
+[list]
+[*]Cook the chicken on a hob or in an oven.
+[*]Put rice and water in a pot and cook it. A rice pot gives 5 portions, and the rice sinks as you take them.
+[*]Put a rice portion and the chicken on a plate and serve.
+[/list]
+
+[h2]Cards[/h2]
+[list]
+[*][b]Shredded Chicken[/b] (main variant): some customers want their chicken chopped.
+[*][b]Chicken - Broccoli[/b] (topping): chop broccoli, cook it with water in a pot, portion it onto the plate.
+[*][b]Lemon Chicken[/b] (topping): add a lemon slice.
+[*][b]Chicken - Soy Sauce[/b] (extra): customers may ask for a bottle of soy sauce at the table.
+[/list]
+Regular side cards work with the chicken plate too. Toppings can be added in any order.
+
+[h2]Details[/h2]
+[list]
+[*]Colourblind labels for toppings (B = broccoli, Le = lemon, Sh = shredded chicken) and the cooked rice pot (R).
+[*]Uses base game and IngredientLib models, so it fits the PlateUp! art style.
+[*]Multiplayer: every player needs the mod.
+[/list]
+
+[h2]Requirements[/h2]
+[list]
+[*]KitchenLib
+[*]IngredientLib
+[/list]
+
+Found a bug or have an idea for a new card? Leave a comment!
