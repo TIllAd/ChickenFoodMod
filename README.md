@@ -59,4 +59,4 @@ A `Debug` build additionally writes a dump of relevant game data to `Mods/Chicke
 
 ## License
 
-See the repository for license information.
+MIT – see [LICENSE](LICENSE).
