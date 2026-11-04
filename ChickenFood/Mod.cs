@@ -39,6 +39,7 @@ namespace MyChickenMod
 
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RicePot>();
+            AddGameDataObject<ChickenOnPlate>();
             AddGameDataObject<MyChicken_Plated>();
             AddGameDataObject<ShreddedChicken_Plated>();
             AddGameDataObject<MyChicken_Plated_Dish>();
