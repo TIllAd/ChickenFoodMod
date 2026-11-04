@@ -28,9 +28,12 @@ namespace MyChickenMod.Custom.Chicken
             new ItemGroup.ItemSet { Min = 1, Max = 1, IsMandatory = true, Items = new List<Item> { Ref(ItemReferences.Plate) } },
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { ChickenItem } },
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { Ref(ItemReferences.RiceContainerCooked) } },
-            // Toppings: nur mit freigeschalteter Karte, bis zu zwei pro Teller.
-            new ItemGroup.ItemSet { Min = 0, Max = 2, RequiresUnlock = true,
-                Items = new List<Item> { Ref(ItemReferences.BroccoliServing), Ref(ItemReferences.LemonSliced) } },
+            // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
+            // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
+            new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
+                Items = new List<Item> { Ref(ItemReferences.BroccoliServing) } },
+            new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
+                Items = new List<Item> { Ref(ItemReferences.LemonSliced) } },
         };
 
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
