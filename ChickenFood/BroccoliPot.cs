@@ -43,6 +43,9 @@ namespace MyChickenMod.Custom.Broccoli
                     var pot = Ref(ItemReferences.Pot).Prefab;
                     PrefabUtil.CloneVisual(pot.transform.Find("Pot").gameObject, _prefab.transform, "Pot", Vector3.zero);
                     _water = PrefabUtil.CloneVisual(pot.transform.Find("Water").gameObject, _prefab.transform, "Water", new Vector3(0f, 0.1f, 0f));
+                    // Wasser etwas schmaler und flacher als im Original, damit es nicht unten aus dem Topf schaut.
+                    _water.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+                    _water.transform.localScale = new Vector3(0.52f, 0.05f, 0.52f);
                     _broccoli = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, _prefab.transform, "Broccoli",
                         new Vector3(0.05f, 0.02f, 0f), 1f);
                 }
