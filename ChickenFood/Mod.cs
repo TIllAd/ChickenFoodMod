@@ -5,6 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using MyChickenMod.Custom.Chicken;
 using MyChickenMod.Custom.Rice;
+using MyChickenMod.Custom.Broccoli;
 using KitchenLib.Event;
 
 namespace MyChickenMod
@@ -39,6 +40,9 @@ namespace MyChickenMod
 
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RicePot>();
+            AddGameDataObject<SteamedBroccoli>();
+            AddGameDataObject<SteamedBroccoliPot>();
+            AddGameDataObject<ChoppedBroccoliPot>();
             AddGameDataObject<MyChicken_Plated>();
             AddGameDataObject<ShreddedChicken_Plated>();
             AddGameDataObject<MyChicken_Plated_Dish>();

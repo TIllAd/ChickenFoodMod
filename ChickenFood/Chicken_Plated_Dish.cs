@@ -117,20 +117,23 @@ namespace MyChickenMod.Custom.Chicken
     {
         public override string UniqueNameID => "ChickenBroccoli_Dish";
         public override int Difficulty => 1;
-        // Wie die Brokkoli-Beilage: Brokkoli + Wasser im Topf kochen, dann portionieren.
+        // Brokkoli schneiden, mit Wasser im Topf kochen, portionieren (eigener Topf, keine Beilage).
         public override HashSet<Item> MinimumIngredients => new HashSet<Item>
         {
             Refs.Item(ItemReferences.BroccoliRaw), Refs.Item(ItemReferences.Pot), Refs.Item(ItemReferences.Water)
         };
-        public override HashSet<Process> RequiredProcesses => new HashSet<Process> { Refs.Process(ProcessReferences.Cook) };
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Item(ItemReferences.BroccoliServing));
+        public override HashSet<Process> RequiredProcesses => new HashSet<Process>
+        {
+            Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
+        };
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Broccoli.SteamedBroccoli>());
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildItemIcon("Chicken Broccoli - Icon", ItemReferences.BroccoliChopped);
 
         public override Dictionary<Locale, string> Recipe => new Dictionary<Locale, string>
         {
-            { Locale.English, "Cook broccoli and water in a pot, then portion it onto the chicken plate." }
+            { Locale.English, "Chop broccoli, cook it with water in a pot, then portion it onto the chicken plate." }
         };
         public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
         {

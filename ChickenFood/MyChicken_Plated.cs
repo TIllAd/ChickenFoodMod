@@ -6,6 +6,7 @@ using KitchenLib.Customs;
 using KitchenLib.References;
 using KitchenLib.Utils;
 using UnityEngine;
+using MyChickenMod.Custom.Broccoli;
 
 namespace MyChickenMod.Custom.Chicken
 {
@@ -17,6 +18,7 @@ namespace MyChickenMod.Custom.Chicken
         protected abstract string PrefabName { get; }
 
         protected static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
+        protected static Item SteamedBroccoliItem => (Item)GDOUtils.GetCustomGameDataObject<SteamedBroccoli>().GameDataObject;
 
         public override Item DirtiesTo => Ref(ItemReferences.PlateDirty);
         public override Item DisposesTo => Ref(ItemReferences.Plate);
@@ -31,7 +33,7 @@ namespace MyChickenMod.Custom.Chicken
             // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
             // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
-                Items = new List<Item> { Ref(ItemReferences.BroccoliServing) } },
+                Items = new List<Item> { SteamedBroccoliItem } },
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
                 Items = new List<Item> { Ref(ItemReferences.LemonSliced) } },
         };
@@ -39,13 +41,13 @@ namespace MyChickenMod.Custom.Chicken
         // Farbenblind-Modus: Buchstaben für alles, was sich nur über die Farbe unterscheidet.
         public override List<ItemGroupView.ColourBlindLabel> Labels => new List<ItemGroupView.ColourBlindLabel>
         {
-            new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.BroccoliServing), Text = "B" },
+            new ItemGroupView.ColourBlindLabel { Item = SteamedBroccoliItem, Text = "B" },
             new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LemonSliced), Text = "Le" },
         };
 
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
         {
-            new ItemGroup.ItemReward { Item = Ref(ItemReferences.BroccoliServing), RewardAmount = 1 },
+            new ItemGroup.ItemReward { Item = SteamedBroccoliItem, RewardAmount = 1 },
             new ItemGroup.ItemReward { Item = Ref(ItemReferences.LemonSliced), RewardAmount = 1 },
         };
 
@@ -72,8 +74,8 @@ namespace MyChickenMod.Custom.Chicken
             var chickenGO = PrefabUtil.AddChicken(Prefab.transform, ChickenCustom);
             var rice = Ref(ItemReferences.RiceContainerCooked);
             var riceGO = PrefabUtil.CloneVisual(rice.Prefab, Prefab.transform, "Rice", PrefabUtil.RicePos, 1.1f);
-            // Topping = gekochte Brokkoli-Portion aus dem Topf; Optik: die geschnittenen Röschen.
-            var broccoli = Ref(ItemReferences.BroccoliServing);
+            // Topping = Portion aus unserem Brokkoli-Topf; Optik: die geschnittenen Röschen.
+            var broccoli = SteamedBroccoliItem;
             var broccoliGO = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, Prefab.transform, "Broccoli", new Vector3(-0.1f, 0.02f, -0.12f), 0.8f);
             var lemon = Ref(ItemReferences.LemonSliced);
             var lemonGO = PrefabUtil.CloneVisual(lemon.Prefab, Prefab.transform, "Lemon", new Vector3(0.14f, 0.06f, 0.12f), 0.7f);
