@@ -126,7 +126,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
         };
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Broccoli.SteamedBroccoli>());
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Item(ItemReferences.BroccoliChoppedContainerCooked));
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildItemIcon("Chicken Broccoli - Icon", ItemReferences.BroccoliChopped);

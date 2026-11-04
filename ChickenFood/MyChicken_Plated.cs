@@ -6,7 +6,6 @@ using KitchenLib.Customs;
 using KitchenLib.References;
 using KitchenLib.Utils;
 using UnityEngine;
-using MyChickenMod.Custom.Broccoli;
 
 namespace MyChickenMod.Custom.Chicken
 {
@@ -18,7 +17,7 @@ namespace MyChickenMod.Custom.Chicken
         protected abstract string PrefabName { get; }
 
         protected static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
-        protected static Item SteamedBroccoliItem => (Item)GDOUtils.GetCustomGameDataObject<SteamedBroccoli>().GameDataObject;
+        protected static Item SteamedBroccoliItem => Ref(ItemReferences.BroccoliChoppedContainerCooked);
 
         public override Item DirtiesTo => Ref(ItemReferences.PlateDirty);
         public override Item DisposesTo => Ref(ItemReferences.Plate);

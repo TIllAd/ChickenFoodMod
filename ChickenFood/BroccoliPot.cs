@@ -63,12 +63,13 @@ namespace MyChickenMod.Custom.Broccoli
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
     }
 
-    // Gekochter Topf: 5 Portionen gedünsteter Brokkoli, wird beim Entnehmen leerer.
+    // Gekochter Topf: 5 Portionen gegarter Brokkoli, wird beim Entnehmen leerer.
     public class SteamedBroccoliPot : CustomItem
     {
         public override string UniqueNameID => "Broccoli - Steamed Pot";
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<SteamedBroccoli>().GameDataObject;
+        // Portion = gegarter geschnittener Brokkoli aus dem Spiel (wie beim Wok-Gericht), keine Beilage.
+        public override Item SplitSubItem => Ref(ItemReferences.BroccoliChoppedContainerCooked);
         public override int SplitCount => 5;
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
         public override Item DisposesTo => Ref(ItemReferences.Pot);
@@ -98,22 +99,5 @@ namespace MyChickenMod.Custom.Broccoli
         }
 
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
-    }
-
-    // Eine Portion gedünsteter Brokkoli: Topping fürs Hähnchen, KEINE Beilage.
-    public class SteamedBroccoli : CustomItem
-    {
-        public override string UniqueNameID => "Broccoli - Steamed";
-        public override ItemStorage ItemStorageFlags => ItemStorage.StackableFood;
-
-        private GameObject _prefab;
-        public override GameObject Prefab => _prefab ??= MakePrefab();
-
-        private static GameObject MakePrefab()
-        {
-            var root = PrefabUtil.CreateRoot("Steamed Broccoli");
-            PrefabUtil.CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.BroccoliChopped)).Prefab, root.transform, "Broccoli", Vector3.zero);
-            return root;
-        }
     }
 }

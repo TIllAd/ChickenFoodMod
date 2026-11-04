@@ -40,7 +40,6 @@ namespace MyChickenMod
 
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RicePot>();
-            AddGameDataObject<SteamedBroccoli>();
             AddGameDataObject<SteamedBroccoliPot>();
             AddGameDataObject<ChoppedBroccoliPot>();
             AddGameDataObject<MyChicken_Plated>();
