@@ -75,6 +75,11 @@ namespace MyChickenMod.Custom.Rice
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
         public override Item DisposesTo => Ref(ItemReferences.Pot);
 
+        public override string ColourBlindTag => "R";
+
+        private static readonly Vector3 RiceFull = new Vector3(0f, 0.15f, 0f);
+        private static readonly Vector3 RiceEmpty = new Vector3(0f, -0.05f, 0f);
+
         private GameObject _prefab;
         public override GameObject Prefab
         {
@@ -85,8 +90,14 @@ namespace MyChickenMod.Custom.Rice
                     _prefab = PrefabUtil.CreateRoot("Rice Cooked Pot");
                     var pot = Ref(ItemReferences.Pot).Prefab;
                     PrefabUtil.CloneVisual(pot.transform.Find("Pot").gameObject, _prefab.transform, "Pot", Vector3.zero);
-                    PrefabUtil.CloneVisual(Ref(ItemReferences.RiceContainerCooked).Prefab, _prefab.transform, "Rice",
-                        new Vector3(0f, 0.15f, 0f), 1.4f);
+                    var rice = PrefabUtil.CloneVisual(Ref(ItemReferences.RiceContainerCooked).Prefab, _prefab.transform, "Rice",
+                        RiceFull, 1.4f);
+
+                    // Reis sinkt im Topf ab, je mehr Portionen entnommen werden (wie bei Suppe).
+                    var view = _prefab.AddComponent<PositionSplittableView>();
+                    ReflectionUtils.GetField<PositionSplittableView>("FullPosition").SetValue(view, RiceFull);
+                    ReflectionUtils.GetField<PositionSplittableView>("EmptyPosition").SetValue(view, RiceEmpty);
+                    ReflectionUtils.GetField<PositionSplittableView>("Objects").SetValue(view, new List<GameObject> { rice });
                 }
                 return _prefab;
             }

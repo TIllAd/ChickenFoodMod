@@ -36,6 +36,13 @@ namespace MyChickenMod.Custom.Chicken
                 Items = new List<Item> { Ref(ItemReferences.LemonSliced) } },
         };
 
+        // Farbenblind-Modus: Buchstaben für alles, was sich nur über die Farbe unterscheidet.
+        public override List<ItemGroupView.ColourBlindLabel> Labels => new List<ItemGroupView.ColourBlindLabel>
+        {
+            new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.BroccoliServing), Text = "B" },
+            new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LemonSliced), Text = "Le" },
+        };
+
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
         {
             new ItemGroup.ItemReward { Item = Ref(ItemReferences.BroccoliServing), RewardAmount = 1 },
@@ -93,6 +100,16 @@ namespace MyChickenMod.Custom.Chicken
     {
         public override string UniqueNameID => "ShreddedChicken_Plated";
         protected override string PrefabName => "Shredded Chicken Plated";
+
+        public override List<ItemGroupView.ColourBlindLabel> Labels
+        {
+            get
+            {
+                var labels = base.Labels;
+                labels.Insert(0, new ItemGroupView.ColourBlindLabel { Item = ChickenItem, Text = "Sh" });
+                return labels;
+            }
+        }
         protected override CustomGameDataObject ChickenCustom => GDOUtils.GetCustomGameDataObject<ShreddedChicken>();
     }
 }

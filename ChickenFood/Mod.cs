@@ -11,9 +11,9 @@ namespace MyChickenMod
 {
     public class Mod : BaseMod, IModSystem
     {
-        public const string MOD_GUID = "com.till.mychickenmod";
-        public const string MOD_NAME = "MyChickenMod";
-        public const string MOD_VERSION = "0.1.0";
+        public const string MOD_GUID = "TillAd.PlateUp.ChickenAndRice";
+        public const string MOD_NAME = "Chicken & Rice";
+        public const string MOD_VERSION = "1.0.0";
         public const string MOD_AUTHOR = "Till";
         public const string MOD_GAMEVERSION = ">=1.1.4";
 
@@ -49,12 +49,15 @@ namespace MyChickenMod
 
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 
+#if DEBUG
+            // Nur in Debug-Builds: Spieldaten zum Nachschauen in eine Datei schreiben.
             Events.BuildGameDataEvent += (s, args) =>
             {
                 if (!args.firstBuild) return;
                 try { DataDump.Write(args.gamedata); }
                 catch (System.Exception e) { LogError("Dump fehlgeschlagen: " + e); }
             };
+#endif
         }
 
 
