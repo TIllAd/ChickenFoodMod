@@ -4,6 +4,8 @@ using KitchenMods;
 using System.Reflection;
 using UnityEngine;
 using MyChickenMod.Custom.Chicken;
+using MyChickenMod.Custom.Rice;
+using KitchenLib.Event;
 
 namespace MyChickenMod
 {
@@ -35,8 +37,24 @@ namespace MyChickenMod
             // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
+            AddGameDataObject<RiceCookedPot>();
+            AddGameDataObject<RicePot>();
             AddGameDataObject<MyChicken_Plated>();
+            AddGameDataObject<ShreddedChicken_Plated>();
             AddGameDataObject<MyChicken_Plated_Dish>();
+            AddGameDataObject<ShreddedChicken_Dish>();
+            AddGameDataObject<ChickenBroccoli_Dish>();
+            AddGameDataObject<ChickenLemon_Dish>();
+            AddGameDataObject<ChickenSoySauce_Dish>();
+
+            Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
+
+            Events.BuildGameDataEvent += (s, args) =>
+            {
+                if (!args.firstBuild) return;
+                try { DataDump.Write(args.gamedata); }
+                catch (System.Exception e) { LogError("Dump fehlgeschlagen: " + e); }
+            };
         }
 
 
