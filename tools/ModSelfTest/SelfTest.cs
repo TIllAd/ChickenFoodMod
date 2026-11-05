@@ -221,15 +221,20 @@ namespace ModSelfTest
                     continue;
                 }
 
-                var contributors = allDishes.Where(d => d != dish && d.UnlocksIngredients != null &&
+                // Karten, die diese Karte voraussetzt (z. B. Grundgericht für eine Variante), sind immer dabei.
+                var required = new List<Dish>();
+                CollectRequired(dish, required, 0);
+                var contributors = allDishes.Where(d => d != dish && !required.Contains(d) && d.UnlocksIngredients != null &&
                     d.UnlocksIngredients.Any(u => u.MenuItem != null && u.MenuItem.ID == group.ID)).ToList();
                 if (contributors.Count > 10) contributors = contributors.Take(10).ToList();
 
                 var configs = new Dictionary<string, (List<int> items, List<string> cards)>();
+                var reported = new HashSet<string>();
                 int subsetCount = 1 << contributors.Count;
                 for (int mask = 0; mask < subsetCount; mask++)
                 {
                     var cards = new List<Dish> { dish };
+                    cards.AddRange(required);
                     for (int b = 0; b < contributors.Count; b++)
                         if ((mask & (1 << b)) != 0) cards.Add(contributors[b]);
 
@@ -241,7 +246,7 @@ namespace ModSelfTest
                     string cardLabel = string.Join(" + ", cards.Select(c => SafeName(c)));
                     foreach (var cfg in OrderConfigurations(group, available, out var warning))
                     {
-                        if (warning != null)
+                        if (warning != null && reported.Add(warning + "|" + cardLabel))
                             Add(dish, "Bestellungen", Short(group.name), "FAIL", $"[{cardLabel}] {warning}", null);
                         var key = string.Join(",", cfg.OrderBy(x => x));
                         if (!configs.TryGetValue(key, out var entry))
@@ -266,6 +271,13 @@ namespace ModSelfTest
                     if (u.Ingredient != null)
                         Add(dish, "Bestellungen", Short(dish.name), "PASS",
                             $"Extra-Wunsch am Tisch: '{Short(u.Ingredient.name)}' zu '{(u.MenuItem != null ? Short(u.MenuItem.name) : "?")}'", RenderItem(u.Ingredient));
+        }
+
+        private static void CollectRequired(Unlock u, List<Dish> into, int depth)
+        {
+            if (u?.Requires == null || depth > 5) return;
+            foreach (var r in u.Requires)
+                if (r is Dish d && !into.Contains(d)) { into.Add(d); CollectRequired(d, into, depth + 1); }
         }
 
         // Alle Ergebnisse, die GetRandomConfiguration des Spiels liefern kann, ohne Zufall.
@@ -499,7 +511,9 @@ namespace ModSelfTest
             string n = o.name;
             foreach (var p in _prefixes) if (n.StartsWith(p)) n = n.Substring(p.Length);
             int dash = n.IndexOf(" - ", StringComparison.Ordinal);
-            return dash > 0 ? n.Substring(0, dash) : n;
+            string mod = dash >= 0 ? n.Substring(0, dash) : n;
+            if (mod.Length == 0) mod = o.name.Substring(0, Math.Max(0, o.name.IndexOf(" - ", StringComparison.Ordinal)));
+            return mod.Length == 0 ? o.name : mod;
         }
 
         private string Short(string name)
