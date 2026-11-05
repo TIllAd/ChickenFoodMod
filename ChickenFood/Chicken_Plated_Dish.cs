@@ -237,12 +237,9 @@ namespace MyChickenMod.Custom.Chicken
         public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
         public override List<Unlock> HardcodedRequirements => new List<Unlock> { Refs.BaseDish };
 
-        // Jeder Teller bekommt "sein" Chicken als zweite Portion freigeschaltet.
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => new HashSet<Dish.IngredientUnlock>
-        {
-            new Dish.IngredientUnlock { MenuItem = (ItemGroup)Refs.Custom<MyChicken_Plated>(), Ingredient = Refs.Custom<CookedChicken>() },
-            new Dish.IngredientUnlock { MenuItem = (ItemGroup)Refs.Custom<ShreddedChicken_Plated>(), Ingredient = Refs.Custom<ShreddedChicken>() },
-        };
+        // Chicken ist vom Grundgericht schon freigeschaltet (Pflicht-Platz) -> eigene Markierung,
+        // die ChickenOrderPatch für den zweiten Chicken-Platz abfragt.
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.BulkingMarker>());
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildPlate("Chicken Bulking - Icon",

@@ -32,7 +32,7 @@ namespace MyChickenMod
 
     internal static class ChickenOrders
     {
-        private static int _plain, _shredded, _rice, _broccoli, _marker;
+        private static int _plain, _shredded, _rice, _broccoli, _marker, _bulkingMarker;
 
         private static bool EnsureIds()
         {
@@ -44,10 +44,16 @@ namespace MyChickenMod
             _rice = GDOUtils.GetCustomGameDataObject<RicePortion>().ID;
             _broccoli = GDOUtils.GetCustomGameDataObject<SteamedBroccoliPortion>().ID;
             _marker = GDOUtils.GetCustomGameDataObject<LowCarbMarker>().ID;
+            _bulkingMarker = GDOUtils.GetCustomGameDataObject<BulkingMarker>().ID;
             return true;
         }
 
         public static bool IsChickenPlate(int group) => EnsureIds() && (group == _plain || group == _shredded);
+
+        // Freischaltpflichtiger Platz, dessen Zutat auch in einem Pflicht-Platz steckt (= zweites Chicken).
+        private static bool IsExtraPortionSet(ItemGroup.ItemSet set, ItemGroup group) =>
+            set.RequiresUnlock && set.Items.Count > 0 && set.Items.All(i => i != null &&
+                group.DerivedSets.Any(o => !o.RequiresUnlock && o.Items.Any(x => x != null && x.ID == i.ID)));
 
         // Chicken-Sets stehen vor dem Beilagen-Platz, sind beim Würfeln also schon drin.
         private static int CountChicken(ItemList items, ItemGroup group)
@@ -76,6 +82,11 @@ namespace MyChickenMod
                     result.Add(choices[Random.Range(0, choices.Count)]);
                     continue;
                 }
+
+                // Zweiter Chicken-Platz (Bulking Season): Chicken ist über den Pflicht-Platz immer
+                // freigeschaltet, deshalb hier nur mit der Markierung der Karte.
+                if (IsExtraPortionSet(set, group) && !available.Contains(_bulkingMarker))
+                    continue;
 
                 // Alles andere wie im Spiel.
                 int num = Random.Range(set.Min, set.Max + 1);
