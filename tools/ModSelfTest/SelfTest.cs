@@ -242,6 +242,10 @@ namespace ModSelfTest
                         .SelectMany(c => c.UnlocksIngredients)
                         .Where(u => u.MenuItem != null && u.MenuItem.ID == group.ID && u.Ingredient != null)
                         .Select(u => u.Ingredient.ID));
+                    // Wie das Spiel beim Freischalten eines Gerichts (HandleNewDish): alle Zutaten aus
+                    // Plätzen ohne RequiresUnlock gelten automatisch als freigeschaltet.
+                    foreach (var set in group.DerivedSets.Where(x => !x.RequiresUnlock))
+                        foreach (var it in set.Items.Where(x => x != null)) available.Add(it.ID);
 
                     string cardLabel = string.Join(" + ", cards.Select(c => SafeName(c)));
                     foreach (var cfg in OrderConfigurations(group, available, out var warning))
