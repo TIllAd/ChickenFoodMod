@@ -30,12 +30,19 @@ Ideen zum Ergänzen der aktuellen Liste („Rice Rice Baby“, „Wing It“, �
 - **Cutting Season:** 2× Chicken **ohne** Reis (Gegenstück zu Bulking; Bulking bestellt bewusst immer Reis).
 - **Leg Day:** Kunden laufen langsamer – witzig, spielerisch fragwürdig. 🤔
 
-### 💡 Kleidung / Kosmetik
-Wie bei Breaking Plates: Outfits aus dem Spiel umfärben bzw. einfache Formen prozedural bauen.
-- **Hühnerkopf-Mütze** (Kamm + Schnabel) – Favorit: einfach, sofort erkennbar, gutes Workshop-Vorschaubild.
-- Ganzes Hühnerkostüm (gelb-weiß, Federn) – mehr Aufwand, lustig im Koop.
-- Gym-Look: Stirnband + Tanktop, Gewichthebergürtel, 80er-Neon-Trainingsanzug.
-- Küche: Schürze in Mod-Farben / mit Reisschale, hohe Kochmütze mit Hühnchen-Anstecker.
+### 🤔 Kleidung / Kosmetik – verschoben (Branch `feature/cosmetics`)
+Erster Versuch Nov 2026, für 1.1.0 rausgenommen. Stand auf dem Branch:
+- Funktioniert/ok: **Chicken Chef Hat** (hohe Kochmütze in reinem Weiß + Hühnchen-Anstecker), **Sweatband** (offener Ring), **Chicken Shack Apron** (weißes Hemd, rote Schürze), **Chicken Costume** (Astronauten-Anzug weiß, gelbe Stiefel – zum Gockel-Hut aus dem Spiel kombinieren).
+- Hat nicht geklappt: **Gym Outfit / Tanktop**, **Retro Tracksuit** (Ladefehler bzw. sah nicht richtig aus).
+- Gestrichen: eigene Hühnerkopf-Mütze – der **Gockel-Hut aus dem Spiel** ist besser.
+
+Gelernt:
+- Spiel-Modelle sind **gesperrt** (nicht lesbar) → Ärmel o. Ä. lassen sich zur Laufzeit nicht wegschneiden.
+- Umfärben geht gut (Material durch „Simple Flat“ ersetzen); Teile verschiedener Outfits lassen sich kombinieren (gleiches Skelett).
+- Brauchbare Vorlagen: **Pilz-Kostüm** = ärmelloses Oberteil + kurze Hose (→ Tanktop/Gym), **Skelett-Kostüm** = Ganzkörperanzug (Muster ist nur Textur → einfarbiger Einteiler), **Kellner** = Weste.
+- Achtung: Unterteile hängen am Elternteil (Pilzhut → Stern) – beim Löschen mitgelöscht.
+- Echte neue Formen (Tanktop, Tracksuit mit Streifen) → Blender-Weg: AssetRipper (FBX mit Skelett) → Blender → Unity-Projekt → `mod.assets`, Mesh im Code gegen Spiel-Mesh tauschen (Knochen per Namen umrechnen).
+- Selbsttest rendert alle Spiel-Outfits als Vorlage (Abschnitt „Spiel (Vorlagen)“).
 
 ---
 
