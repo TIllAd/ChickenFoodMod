@@ -1,13 +1,13 @@
 # ModSelfTest starten: Test-Mod installieren, PlateUp starten, auf Bericht warten, Bericht oeffnen.
 #
-#   .\run-selftest.ps1                         # alle Mods mit "TillAd.PlateUp." testen
-#   .\run-selftest.ps1 -Prefix "TillAd.PlateUp.ChickenAndRice"
+#   .\run-selftest.ps1                         # Chicken & Rice testen
+#   .\run-selftest.ps1 -Prefix "TillAd.PlateUp."   # alle eigenen Mods (auch Breaking Plates)
 #   .\run-selftest.ps1 -NoQuit                 # Spiel nach dem Test offen lassen
 #
 # Getestet werden die Mods, die gerade installiert sind (Workshop-Abo oder PlateUp\Mods).
 
 param(
-    [string[]]$Prefix = @("TillAd.PlateUp."),
+    [string[]]$Prefix = @("TillAd.PlateUp.ChickenAndRice"),
     [switch]$NoQuit,
     [int]$TimeoutSec = 300,
     [string]$GameDir = "C:\Program Files (x86)\Steam\steamapps\common\PlateUp\PlateUp"

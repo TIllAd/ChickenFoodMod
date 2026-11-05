@@ -52,7 +52,7 @@ namespace ModSelfTest
                 var flag = File.ReadAllLines(SelfTest.FlagPath).Select(l => l.Trim().Trim('\uFEFF')).Where(l => l.Length > 0).ToList();
                 quit = !flag.Any(l => l.Equals("noquit", StringComparison.OrdinalIgnoreCase));
                 var prefixes = flag.Where(l => !l.Equals("noquit", StringComparison.OrdinalIgnoreCase)).ToList();
-                if (prefixes.Count == 0) prefixes.Add("TillAd.PlateUp.");
+                if (prefixes.Count == 0) prefixes.Add("TillAd.PlateUp.ChickenAndRice");
                 new SelfTest(prefixes).Run();
             }
             catch (Exception e)
@@ -79,7 +79,7 @@ namespace ModSelfTest
         private static string ImgDir => Path.Combine(OutDir, "img");
 
         private const int MaxCombosPerGroup = 4000;
-        private const int MaxRendersPerGroup = 64;
+        private const int MaxRendersPerGroup = 128;
         private const int ImageSize = 256;
 
         private readonly List<string> _prefixes;
@@ -159,9 +159,25 @@ namespace ModSelfTest
                 }
                 else if (gid != g.ID && sat == Satisfaction.Partial)
                 {
-                    warns++;
-                    Add(g, "Kombinationen", Short(g.name), "WARN",
-                        $"{label} wird zwischendurch als '{Name(gid)}' erkannt (Teilstand)", null);
+                    // Vorläufig einem anderen Gericht zugeordnet. Unkritisch, solange unser Gericht den
+                    // Teilstand auch akzeptiert: mit der nächsten Zutat wird neu zugeordnet.
+                    var own = _data.ItemSetView.IsGroupSatisfied(_data.ItemSetView.GetGroupData(g.ID), list);
+                    if (own == Satisfaction.Impossible)
+                    {
+                        warns++;
+                        Add(g, "Kombinationen", Short(g.name), "WARN",
+                            $"{label} wird als '{Name(gid)}' erkannt und passt nicht mehr zu diesem Gericht", RenderGroup(gid, list, false));
+                    }
+                    else
+                    {
+                        passes++;
+                        if (rendered < MaxRendersPerGroup)
+                        {
+                            rendered++;
+                            Add(g, "Kombinationen (Bilder)", Short(g.name), "PASS",
+                                $"{label}<br><small>Teilstand, vorläufig als '{Name(gid)}' geführt (unkritisch)</small>", RenderGroup(gid, list, false));
+                        }
+                    }
                 }
                 else if (gid != g.ID)
                 {
@@ -176,10 +192,11 @@ namespace ModSelfTest
                 else
                 {
                     passes++;
-                    if (complete && rendered < MaxRendersPerGroup)
+                    if (rendered < MaxRendersPerGroup)
                     {
                         rendered++;
-                        Add(g, "Fertige Kombinationen", Short(g.name), "PASS", label, RenderGroup(g.ID, list, false));
+                        Add(g, "Kombinationen (Bilder)", Short(g.name), "PASS",
+                            complete ? $"<b>fertig</b>: {label}" : $"{label}<br><small>Teilstand</small>", RenderGroup(g.ID, list, false));
                     }
                 }
             }
@@ -451,7 +468,7 @@ namespace ModSelfTest
                 h.Append("</div>");
             }
 
-            string[] order = { "Karten", "Bestellungen", "Fertige Kombinationen", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
+            string[] order = { "Karten", "Bestellungen", "Kombinationen (Bilder)", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
             foreach (var mod in _entries.Select(e => e.Mod).Distinct().OrderBy(m => m))
             {
                 h.Append($"<h2>{Enc(mod)}</h2>");

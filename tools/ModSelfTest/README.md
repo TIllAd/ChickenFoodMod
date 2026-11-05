@@ -10,7 +10,7 @@ Doppelklick auf `run-selftest.bat` (oder `.\run-selftest.ps1` in PowerShell).
 
 Optionen:
 
-- `-Prefix "TillAd.PlateUp.ChickenAndRice"`: nur einen Mod testen (Standard: alle `TillAd.PlateUp.*`)
+- Standard: nur Chicken & Rice. `-Prefix "TillAd.PlateUp."` testet alle eigenen Mods (auch Breaking Plates)
 - `-NoQuit`: Spiel nach dem Test offen lassen
 
 Getestet werden die Mods, die gerade installiert sind (Workshop-Abo oder lokaler `PlateUp\Mods`-Ordner).
