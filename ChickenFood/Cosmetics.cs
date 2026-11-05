@@ -146,6 +146,7 @@ namespace MyChickenMod.Custom.Cosmetics
             var comp = root.GetComponent<PlayerOutfitComponent>();
             foreach (var r in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
             {
+                if (r == null) continue; // schon mit einem übergeordneten Teil gelöscht (z. B. Stern am Pilzhut)
                 string n = r.gameObject.name;
                 if (n == "Body") continue; // Spielerkörper nie anfassen
                 var (remove, mat) = rule(n);
