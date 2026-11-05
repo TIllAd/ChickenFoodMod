@@ -280,28 +280,33 @@ namespace ModSelfTest
                 if (r is Dish d && !into.Contains(d)) { into.Add(d); CollectRequired(d, into, depth + 1); }
         }
 
-        // Alle Ergebnisse, die GetRandomConfiguration des Spiels liefern kann, ohne Zufall.
+        // Bestellungen so erzeugen, wie das Spiel es tut: die echte Funktion (inkl. Patches von Mods)
+        // oft aufrufen und alle verschiedenen Ergebnisse sammeln.
+        private const int OrderSamples = 400;
+
         private List<List<int>> OrderConfigurations(ItemGroup group, HashSet<int> available, out string warning)
         {
             warning = null;
-            var perSet = new List<List<List<int>>>();
-            foreach (var s in group.DerivedSets)
+            var seen = new Dictionary<string, List<int>>();
+            var state = UnityEngine.Random.state;
+            UnityEngine.Random.InitState(12345);
+            try
             {
-                var candidates = s.Items.Where(i => i != null && (!s.RequiresUnlock || available.Contains(i.ID))).Select(i => i.ID).ToList();
-                var options = new List<List<int>>();
-                for (int k = s.Min; k <= s.Max; k++)
+                for (int i = 0; i < OrderSamples; i++)
                 {
-                    if (candidates.Count < k)
-                    {
-                        options.Add(new List<int>(candidates));
-                        if (k == s.Min && s.Min > 0)
-                            warning = $"Set mit {string.Join("/", s.Items.Where(i => i != null).Select(i => Short(i.name)))} braucht {s.Min}, freigeschaltet sind nur {candidates.Count} → Bestellung unvollständig";
-                    }
-                    else options.AddRange(Subsets(candidates, k, k));
+                    var cfg = _data.ItemSetView.GetRandomConfiguration(group.ID, available);
+                    var ids = new List<int>();
+                    foreach (int id in cfg) ids.Add(id);
+                    var key = string.Join(",", ids.OrderBy(x => x));
+                    if (!seen.ContainsKey(key)) seen[key] = ids;
                 }
-                perSet.Add(options.Count > 0 ? options : new List<List<int>> { new List<int>() });
             }
-            return Product(perSet, MaxCombosPerGroup).Select(c => c.SelectMany(x => x).ToList()).ToList();
+            finally { UnityEngine.Random.state = state; }
+
+            foreach (var s in group.DerivedSets.Where(s => s.Min > 0 && s.RequiresUnlock))
+                if (!s.Items.Any(i => i != null && available.Contains(i.ID)))
+                    warning = $"Set mit {string.Join("/", s.Items.Where(i => i != null).Select(i => Short(i.name)))} braucht {s.Min}, freigeschaltet ist nichts davon";
+            return seen.Values.ToList();
         }
 
         // ------------------------------------------------------------------ 3. Items / Geräte / Karten
