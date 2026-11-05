@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Kitchen;
 using KitchenData;
 using KitchenLib.Customs;
@@ -23,6 +24,8 @@ namespace MyChickenMod.Custom.Cosmetics
         public const int HandymanChef = -1776995498;
         public const int FrankensteinChef = -2013127355;
         public const int ButcherChef = -1627755214;
+        public const int AstronautChef = 20631900;
+        public const int DiverChef = -950136670;
     }
 
     internal static class Palette
@@ -38,6 +41,8 @@ namespace MyChickenMod.Custom.Cosmetics
         public static readonly Color NeonTeal = new Color(0.1f, 0.85f, 0.8f);
         public static readonly Color ShirtWhite = new Color(0.96f, 0.96f, 0.94f);
         public static readonly Color BroccoliGreen = new Color(0.25f, 0.6f, 0.25f);
+        public static readonly Color ShackRed = new Color(0.8f, 0.12f, 0.1f);
+        public static readonly Color TankWhite = new Color(0.92f, 0.92f, 0.9f);
     }
 
     internal static class Mat
@@ -98,6 +103,11 @@ namespace MyChickenMod.Custom.Cosmetics
             return Lathe(p);
         }
 
+        // Offener Ring (Stirnband), Achse = y.
+        public static Mesh Ring(float inner, float outer, float height) =>
+            Lathe(new[] { new Vector2(inner, 0f), new Vector2(outer, 0f), new Vector2(outer, height),
+                          new Vector2(inner, height), new Vector2(inner, 0f) }, 24);
+
         // Kegel, Spitze zeigt nach +y.
         public static Mesh Cone(float r, float h) =>
             Lathe(new[] { new Vector2(0f, 0f), new Vector2(r, 0f), new Vector2(0f, h) });
@@ -149,6 +159,38 @@ namespace MyChickenMod.Custom.Cosmetics
                 for (int i = 0; i < mats.Length; i++) mats[i] = mat;
                 r.sharedMaterials = mats;
             }
+        }
+
+        // Ärmel entfernen: alle Dreiecke weg, die überwiegend an Oberarm/Unterarm/Hand hängen.
+        public static void CutSleeves(SkinnedMeshRenderer r)
+        {
+            if (r == null || r.sharedMesh == null || r.bones == null || r.bones.Length == 0) return;
+            var mesh = UnityEngine.Object.Instantiate(r.sharedMesh);
+            mesh.name = r.sharedMesh.name + " (sleeveless)";
+            var bones = r.bones;
+            bool IsArm(int i) => i >= 0 && i < bones.Length && bones[i] != null &&
+                (bones[i].name.StartsWith("UpperArm") || bones[i].name.StartsWith("LowerArm") || bones[i].name.StartsWith("Hand"));
+            var w = mesh.boneWeights;
+            var arm = new bool[w.Length];
+            for (int i = 0; i < w.Length; i++)
+            {
+                float armWeight = (IsArm(w[i].boneIndex0) ? w[i].weight0 : 0f) + (IsArm(w[i].boneIndex1) ? w[i].weight1 : 0f)
+                                + (IsArm(w[i].boneIndex2) ? w[i].weight2 : 0f) + (IsArm(w[i].boneIndex3) ? w[i].weight3 : 0f);
+                arm[i] = armWeight > 0.5f;
+            }
+            for (int sub = 0; sub < mesh.subMeshCount; sub++)
+            {
+                var tris = mesh.GetTriangles(sub);
+                var keep = new List<int>(tris.Length);
+                for (int t = 0; t < tris.Length; t += 3)
+                {
+                    int armCount = (arm[tris[t]] ? 1 : 0) + (arm[tris[t + 1]] ? 1 : 0) + (arm[tris[t + 2]] ? 1 : 0);
+                    if (armCount >= 2) continue;
+                    keep.Add(tris[t]); keep.Add(tris[t + 1]); keep.Add(tris[t + 2]);
+                }
+                mesh.SetTriangles(keep, sub);
+            }
+            r.sharedMesh = mesh;
         }
 
         // Container, der beim Anziehen an den Kopf-Knochen gehängt wird.
@@ -217,10 +259,18 @@ namespace MyChickenMod.Custom.Cosmetics
         private GameObject _visual;
         public override GameObject Visual => _visual ??= Make();
 
+        // Offener Ring um die Stirn (Startwerte: Höhe/Radius am Kopf).
         private static GameObject Make()
         {
-            var root = CosmeticUtil.Clone(VanillaCosmetics.Bandana, "ChickenFood Sweatband");
-            CosmeticUtil.Restyle(root, n => n.Contains("Tie") ? (true, null) : (false, Mat.Flat("Sweat Red", Palette.SweatRed, 0.05f)));
+            var root = PrefabUtil.CreateRoot("ChickenFood Sweatband");
+            var comp = root.AddComponent<PlayerOutfitComponent>();
+            comp.Renderers = new List<SkinnedMeshRenderer>();
+            comp.Hats = new List<Renderer>();
+            var head = CosmeticUtil.HeadAttachment(root);
+            var band = Shapes.Create("Band", head, Shapes.Ring(0.225f, 0.25f, 0.07f), Mat.Flat("Sweat Red", Palette.SweatRed, 0.05f),
+                new Vector3(0f, 0.15f, 0.01f), new Vector3(-8f, 0f, 0f));
+            Shapes.Create("Stripe", band.transform, Shapes.Ring(0.249f, 0.253f, 0.02f), Mat.Flat("Shirt White", Palette.ShirtWhite),
+                new Vector3(0f, 0.025f, 0f));
             return root;
         }
     }
@@ -270,12 +320,13 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
-            var root = CosmeticUtil.Clone(VanillaCosmetics.ChefOutfit, "ChickenFood Chicken Costume");
+            // Ganzkörperanzug: Astronauten-Outfit ohne Helm, weiß, gelbe Stiefel = Hühnerfüße.
+            var root = CosmeticUtil.Clone(VanillaCosmetics.AstronautChef, "ChickenFood Chicken Costume");
             var white = Mat.Flat("Feather White", Palette.FeatherWhite);
             var yellow = Mat.Flat("Beak Yellow", Palette.BeakYellow, 0.3f);
             CosmeticUtil.Restyle(root, n =>
-                n == "Hat" ? (true, null) :
-                n.Contains("Buttons") ? (false, yellow) :
+                n.Contains("Helmet") || n.Contains("Tank") || n.Contains("Pack") ? (true, null) :
+                n.Contains("Boots") ? (false, yellow) :
                 (false, white));
             CosmeticUtil.AddChickenHead(CosmeticUtil.HeadAttachment(root));
             return root;
@@ -288,7 +339,7 @@ namespace MyChickenMod.Custom.Cosmetics
         public override CosmeticType CosmeticType => CosmeticType.Outfit;
         public override List<(Locale, CosmeticInfo)> InfoList => new List<(Locale, CosmeticInfo)>
         {
-            (Locale.English, new CosmeticInfo { Name = "Gym Outfit", Description = "Comes with a lifting belt. Never skip leg day." })
+            (Locale.English, new CosmeticInfo { Name = "Gym Outfit", Description = "Tank top and lifting belt. Never skip leg day." })
         };
 
         private GameObject _visual;
@@ -296,12 +347,15 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
+            // Tanktop = Hemd mit abgeschnittenen Ärmeln; dazu schwarze Hose und Gewichthebergürtel.
             var root = CosmeticUtil.Clone(VanillaCosmetics.HandymanChef, "ChickenFood Gym Outfit");
             CosmeticUtil.Restyle(root, n =>
                 n.Contains("Hat") ? (true, null) :
                 n.Contains("Belt") ? (false, Mat.Flat("Belt Brown", Palette.BeltBrown, 0.3f)) :
                 n.Contains("Trousers") ? (false, Mat.Flat("Gym Black", Palette.GymBlack)) :
-                (false, Mat.Flat("Gym Grey", Palette.GymGrey)));
+                (false, Mat.Flat("Tank White", Palette.TankWhite)));
+            foreach (var r in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                if (r.gameObject.name == "Handyman Chef") CosmeticUtil.CutSleeves(r);
             return root;
         }
     }
@@ -320,22 +374,23 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
-            var root = CosmeticUtil.Clone(VanillaCosmetics.FrankensteinChef, "ChickenFood Retro Tracksuit");
+            // Ganzkörper-Anzug: Taucher-Outfit ohne Helm/Flaschen/Handschuhe, neon, weiße Schuhe.
+            var root = CosmeticUtil.Clone(VanillaCosmetics.DiverChef, "ChickenFood Retro Tracksuit");
             CosmeticUtil.Restyle(root, n =>
-                n.Contains("Hat") ? (true, null) :
-                n.Contains("Trousers") ? (false, Mat.Flat("Neon Teal", Palette.NeonTeal, 0.4f)) :
+                n.Contains("Helmet") || n.Contains("Tank") || n.Contains("Gloves") ? (true, null) :
+                n.Contains("Boots") ? (false, Mat.Flat("Shirt White", Palette.ShirtWhite)) :
                 (false, Mat.Flat("Neon Pink", Palette.NeonPink, 0.4f)));
             return root;
         }
     }
 
-    public class RiceCookApron : CustomPlayerCosmetic
+    public class ChickenShackApron : CustomPlayerCosmetic
     {
-        public override string UniqueNameID => "Rice Cook Apron";
+        public override string UniqueNameID => "Chicken Shack Apron";
         public override CosmeticType CosmeticType => CosmeticType.Outfit;
         public override List<(Locale, CosmeticInfo)> InfoList => new List<(Locale, CosmeticInfo)>
         {
-            (Locale.English, new CosmeticInfo { Name = "Rice Cook Apron", Description = "Rice rice baby." })
+            (Locale.English, new CosmeticInfo { Name = "Chicken Shack Apron", Description = "Golden, crispy, served hot." })
         };
 
         private GameObject _visual;
@@ -343,10 +398,10 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
-            var root = CosmeticUtil.Clone(VanillaCosmetics.ButcherChef, "ChickenFood Rice Cook Apron");
+            var root = CosmeticUtil.Clone(VanillaCosmetics.ButcherChef, "ChickenFood Chicken Shack Apron");
             CosmeticUtil.Restyle(root, n =>
                 n.Contains("Hat") ? (true, null) :
-                n.Contains("Apron") ? (false, Mat.Flat("Broccoli Green", Palette.BroccoliGreen)) :
+                n.Contains("Apron") ? (false, Mat.Flat("Shack Red", Palette.ShackRed)) :
                 (false, Mat.Flat("Shirt White", Palette.ShirtWhite)));
             return root;
         }

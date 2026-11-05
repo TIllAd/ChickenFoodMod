@@ -66,7 +66,7 @@ namespace MyChickenMod
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenCostume>();
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.GymOutfit>();
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.RetroTracksuit>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.RiceCookApron>();
+            AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenShackApron>();
 
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 
