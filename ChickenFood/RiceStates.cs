@@ -13,20 +13,17 @@ using UnityEngine;
 namespace MyChickenMod.Custom.Rice
 {
     // ---------------------------------------------------------------------------------
-    // Karten "Burnt Rice" und "Cold Rice"
+    // Karte "Burnt Rice"
     //
     // Prozesse hängen im Spiel fest am Item und lassen sich nicht pro Karte schalten.
-    // Darum gibt es den gekochten Reistopf in vier gleich aussehenden Varianten:
-    //   normal | brennt an | kühlt ab | beides
-    // RicePotStateSystem tauscht jeden gekochten Topf in die Variante, die zu den aktiven
-    // Karten passt. Anbrennen/Abkühlen erledigt danach die eingebaute Spielmechanik
-    // (Fortschrittsbalken, Feuergefahr auf dem Herd, Herd stoppt das Abkühlen).
+    // Darum gibt es den gekochten Reistopf in zwei gleich aussehenden Varianten: normal | brennt an.
+    // RicePotStateSystem tauscht jeden gekochten Topf in die Variante, die zur Karte passt.
+    // Das Anbrennen erledigt danach die eingebaute Spielmechanik (Fortschrittsbalken, Feuergefahr).
+    // ("Cold Rice" wurde gestrichen: ohne Gerät zeigt das Spiel keinen Fortschrittsbalken an.)
     // ---------------------------------------------------------------------------------
     internal static class RiceTuning
     {
         public const float BurnTime = 15f;    // so lange darf gar gekochter Reis noch auf dem Herd stehen
-        public const float CoolTime = 25f;    // so lange bleibt er abseits vom Herd warm
-        public const float ReheatTime = 3f;   // kalten Reis kurz auf den Herd -> wieder warm
         public const int Portions = 5;
     }
 
@@ -34,7 +31,6 @@ namespace MyChickenMod.Custom.Rice
     public abstract class RiceCookedPotBase : CustomItem
     {
         protected virtual bool Burns => false;
-        protected virtual bool Cools => false;
 
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
         public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
@@ -56,15 +52,6 @@ namespace MyChickenMod.Custom.Rice
             }
             : new List<Item.ItemProcess>();
 
-        public override Item.ItemProcess AutomaticItemProcess => Cools
-            ? new Item.ItemProcess
-            {
-                Process = (Process)GDOUtils.GetCustomGameDataObject<RiceCoolDownProcess>().GameDataObject,
-                Duration = RiceTuning.CoolTime,
-                IsBad = true,
-                Result = (Item)GDOUtils.GetCustomGameDataObject<RiceColdPot>().GameDataObject
-            }
-            : default;
 
         private GameObject _prefab;
         public override GameObject Prefab => _prefab ??= RicePotVisuals.BuildCookedPot(UniqueNameID, null);
@@ -76,48 +63,6 @@ namespace MyChickenMod.Custom.Rice
     {
         public override string UniqueNameID => "Rice - Cooked Pot (Burns)";
         protected override bool Burns => true;
-    }
-
-    public class RiceCookedPotCooling : RiceCookedPotBase
-    {
-        public override string UniqueNameID => "Rice - Cooked Pot (Cools)";
-        protected override bool Cools => true;
-    }
-
-    public class RiceCookedPotBurningCooling : RiceCookedPotBase
-    {
-        public override string UniqueNameID => "Rice - Cooked Pot (Burns, Cools)";
-        protected override bool Burns => true;
-        protected override bool Cools => true;
-    }
-
-    // Kalter Reis: Portionen bleiben im Topf, lassen sich aber erst nach dem Aufwärmen entnehmen.
-    public class RiceColdPot : CustomItem
-    {
-        public override string UniqueNameID => "Rice - Cold Pot";
-        public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
-        public override int SplitCount => RiceTuning.Portions;
-        public override bool PreventExplicitSplit => true;
-        public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
-        public override Item DisposesTo => Ref(ItemReferences.Pot);
-        public override string ColourBlindTag => "Rc";
-
-        // Aufwärmen ergibt den normalen Topf; das System macht daraus wieder die passende Variante.
-        public override List<Item.ItemProcess> Processes => new List<Item.ItemProcess>
-        {
-            new Item.ItemProcess
-            {
-                Process = (Process)GDOUtils.GetExistingGDO(ProcessReferences.Cook),
-                Duration = RiceTuning.ReheatTime,
-                Result = (Item)GDOUtils.GetCustomGameDataObject<RiceCookedPot>().GameDataObject
-            }
-        };
-
-        private GameObject _prefab;
-        public override GameObject Prefab => _prefab ??= RicePotVisuals.BuildCookedPot("Rice Cold Pot", new Color(0.72f, 0.85f, 1f));
-
-        private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
     }
 
     // Angebrannt: nur noch wegwerfen (Mülleimer gibt den Topf zurück).
@@ -146,17 +91,6 @@ namespace MyChickenMod.Custom.Rice
         }
 
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
-    }
-
-    // Eigener Prozess "Abkühlen": läuft automatisch, ein Herd (Kochen) hebt ihn auf.
-    public class RiceCoolDownProcess : CustomProcess
-    {
-        public override string UniqueNameID => "Rice - Cool Down";
-        public override Process IsCounteractedBy => (Process)GDOUtils.GetExistingGDO(ProcessReferences.Cook);
-        public override List<(Locale, ProcessInfo)> InfoList => new List<(Locale, ProcessInfo)>
-        {
-            (Locale.English, new ProcessInfo { Name = "Cool Down", Icon = "<sprite name=\"cook\">" })
-        };
     }
 
     internal static class RicePotVisuals
@@ -224,20 +158,6 @@ namespace MyChickenMod.Custom.Rice
         };
     }
 
-    public class ColdRiceCard : RiceDifficultyCard
-    {
-        public override string UniqueNameID => "ChickenColdRice_Card";
-        public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
-        {
-            (Locale.English, new UnlockInfo
-            {
-                Name = "Cold Rice",
-                Description = "Cooked rice cools down away from the hob and must be reheated before portioning",
-                FlavourText = "Nobody likes cold rice."
-            })
-        };
-    }
-
     // ---------- System ----------
     public class RicePotStateSystem : GameSystemBase, IModSystem
     {
@@ -248,7 +168,7 @@ namespace MyChickenMod.Custom.Rice
         private readonly Dictionary<Entity, (int ID, int Remaining)> _memory = new Dictionary<Entity, (int, int)>();
         private readonly HashSet<Entity> _seen = new HashSet<Entity>();
 
-        private int _normal, _burns, _cools, _both, _cold, _burnCard, _coldCard;
+        private int _normal, _burns, _burnCard;
         private HashSet<int> _family;
 
         protected override void Initialise()
@@ -265,12 +185,8 @@ namespace MyChickenMod.Custom.Rice
             if (normal?.GameDataObject == null) return false;
             _normal = normal.ID;
             _burns = GDOUtils.GetCustomGameDataObject<RiceCookedPotBurning>().ID;
-            _cools = GDOUtils.GetCustomGameDataObject<RiceCookedPotCooling>().ID;
-            _both = GDOUtils.GetCustomGameDataObject<RiceCookedPotBurningCooling>().ID;
-            _cold = GDOUtils.GetCustomGameDataObject<RiceColdPot>().ID;
             _burnCard = GDOUtils.GetCustomGameDataObject<BurntRiceCard>().ID;
-            _coldCard = GDOUtils.GetCustomGameDataObject<ColdRiceCard>().ID;
-            _family = new HashSet<int> { _normal, _burns, _cools, _both, _cold };
+            _family = new HashSet<int> { _normal, _burns };
             return true;
         }
 
@@ -283,17 +199,16 @@ namespace MyChickenMod.Custom.Rice
             }
             if (!EnsureIds()) return;
 
-            bool burn = false, cool = false;
+            bool burn = false;
             using (var unlocks = _unlocks.ToComponentDataArray<CProgressionUnlock>(Allocator.Temp))
             {
                 foreach (var u in unlocks)
                 {
                     if (!u.IsActive) continue;
                     if (u.ID == _burnCard) burn = true;
-                    else if (u.ID == _coldCard) cool = true;
                 }
             }
-            int wanted = burn ? (cool ? _both : _burns) : (cool ? _cools : _normal);
+            int wanted = burn ? _burns : _normal;
 
             _seen.Clear();
             var ctx = new EntityContext(EntityManager);
@@ -314,7 +229,7 @@ namespace MyChickenMod.Custom.Rice
                     }
 
                     // Kalter Reis bleibt kalt, bis er aufgewärmt wurde. Sonst: passende Variante.
-                    if (item.ID != _cold && item.ID != wanted)
+                    if (item.ID != wanted)
                     {
                         int remaining = split.RemainingCount;
                         ctx.ChangeItemType(e, wanted, false, 0, false);

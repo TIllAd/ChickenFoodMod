@@ -42,13 +42,9 @@ namespace MyChickenMod
             AddGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>();
             AddGameDataObject<MyChickenMod.Custom.Portions.LowCarbMarker>();
             AddGameDataObject<MyChickenMod.Custom.Portions.BulkingMarker>();
-            AddGameDataObject<RiceCoolDownProcess>();
             AddGameDataObject<RiceBurntPot>();
-            AddGameDataObject<RiceColdPot>();
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RiceCookedPotBurning>();
-            AddGameDataObject<RiceCookedPotCooling>();
-            AddGameDataObject<RiceCookedPotBurningCooling>();
             AddGameDataObject<RicePot>();
             AddGameDataObject<SteamedBroccoliPot>();
             AddGameDataObject<ChoppedBroccoliPot>();
@@ -62,7 +58,6 @@ namespace MyChickenMod
             AddGameDataObject<LowCarb_Dish>();
             AddGameDataObject<BulkingSeason_Dish>();
             AddGameDataObject<BurntRiceCard>();
-            AddGameDataObject<ColdRiceCard>();
 
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 
