@@ -59,14 +59,6 @@ namespace MyChickenMod
             AddGameDataObject<BulkingSeason_Dish>();
             AddGameDataObject<BurntRiceCard>();
 
-            // Kosmetik
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.SweatbandHat>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenChefHat>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenCostume>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.GymOutfit>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.RetroTracksuit>();
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenShackApron>();
-
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 
 #if DEBUG
