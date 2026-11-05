@@ -28,8 +28,7 @@ namespace MyChickenMod.Custom.Chicken
         public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
         public override int Difficulty => 2;
         public override bool IsAvailableAsLobbyOption => true;
-        // Einfaches Gericht -> keine Kundenreduktion (Feedback aus dem Workshop).
-        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.None;
+        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
         public override List<string> StartingNameSet => new List<string>
         {
             "Chicken & Rice", "Rice Rice Baby", "Wing It", "Cluck & Cook", "The Rice Is Right", "Fowl Play"
