@@ -40,6 +40,7 @@ namespace MyChickenMod
 
             AddGameDataObject<MyChickenMod.Custom.Portions.RicePortion>();
             AddGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>();
+            AddGameDataObject<MyChickenMod.Custom.Portions.LowCarbMarker>();
             AddGameDataObject<RiceCoolDownProcess>();
             AddGameDataObject<RiceBurntPot>();
             AddGameDataObject<RiceColdPot>();

@@ -94,15 +94,15 @@ namespace MyChickenMod
 
         // Teller mit Hähnchen und Reis: für Icons und Anzeige im Hauptquartier.
         public static GameObject BuildPlate(string name, CustomGameDataObject chicken,
-            bool lettuceInsteadOfRice = false, bool doubleChicken = false)
+            bool broccoliInsteadOfRice = false, bool doubleChicken = false)
         {
             var root = CreateRoot(name);
             CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.Plate)).Prefab, root.transform, "Plate", Vector3.zero);
             AddChicken(root.transform, chicken);
             if (doubleChicken)
                 AddChicken(root.transform, chicken).transform.localPosition = Chicken2Pos;
-            if (lettuceInsteadOfRice)
-                CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.LettuceChopped)).Prefab, root.transform, "Lettuce", RicePos, 1f);
+            if (broccoliInsteadOfRice)
+                CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.BroccoliChopped)).Prefab, root.transform, "Broccoli", RicePos, 0.9f);
             else
                 CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.RiceContainerCooked)).Prefab, root.transform, "Rice", RicePos, 1.1f);
             return root;

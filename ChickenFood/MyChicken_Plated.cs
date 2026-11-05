@@ -31,16 +31,17 @@ namespace MyChickenMod.Custom.Chicken
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { ChickenItem } },
             // Bulking Season: zweite Portion Chicken, nur mit Karte (dann ~50 % der Bestellungen).
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true, Items = new List<Item> { ChickenItem } },
-            // Beilage: Reis (vom Grundgericht freigeschaltet) oder - mit Karte "Low Carb" - Salat statt Reis.
-            // Gleiches Muster wie die Soßen bei FryThat: Pflichtauswahl aus den freigeschalteten Zutaten.
-            new ItemGroup.ItemSet { Min = 1, Max = 1, RequiresUnlock = true,
-                Items = new List<Item> { RiceItem, Ref(ItemReferences.LettuceChopped) } },
             // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
             // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
+            // WICHTIG: vor dem Beilagen-Platz, damit ein Brokkoli zuerst als Topping zählt.
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
                 Items = new List<Item> { SteamedBroccoliItem } },
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
                 Items = new List<Item> { Ref(ItemReferences.LemonSliced) } },
+            // Beilagen-Platz: Reis oder (Karte "Low Carb") Brokkoli statt Reis - höchstens eins davon.
+            // Min 0, damit Chicken + 1 Brokkoli auch als fertig gilt; was bestellt wird, regelt ChickenOrderPatch.
+            new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
+                Items = new List<Item> { RiceItem, SteamedBroccoliItem } },
         };
 
         // Farbenblind-Modus: Buchstaben für alles, was sich nur über die Farbe unterscheidet.
@@ -48,7 +49,6 @@ namespace MyChickenMod.Custom.Chicken
         {
             new ItemGroupView.ColourBlindLabel { Item = SteamedBroccoliItem, Text = "B" },
             new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LemonSliced), Text = "Le" },
-            new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LettuceChopped), Text = "Sa" },
         };
 
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
@@ -87,9 +87,9 @@ namespace MyChickenMod.Custom.Chicken
             // Topping = Portion aus unserem Brokkoli-Topf; Optik: die geschnittenen Röschen.
             var broccoli = SteamedBroccoliItem;
             var broccoliGO = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, Prefab.transform, "Broccoli", new Vector3(-0.1f, 0.02f, -0.12f), 0.8f);
+            // Zweiter Brokkoli (Low Carb mit Topping): auf dem Reis-Platz.
+            var broccoli2GO = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, Prefab.transform, "Broccoli 2", PrefabUtil.RicePos + new Vector3(0f, 0.02f, 0f), 0.9f);
             var lemon = Ref(ItemReferences.LemonSliced);
-            var lettuce = Ref(ItemReferences.LettuceChopped);
-            var lettuceGO = PrefabUtil.CloneVisual(lettuce.Prefab, Prefab.transform, "Lettuce", PrefabUtil.RicePos, 1f);
             var lemonGO = PrefabUtil.CloneVisual(lemon.Prefab, Prefab.transform, "Lemon", new Vector3(0.14f, 0.06f, 0.12f), 0.7f);
 
             Prefab.GetComponent<ItemGroupView>().ComponentGroups = new List<ItemGroupView.ComponentGroup>
@@ -97,9 +97,8 @@ namespace MyChickenMod.Custom.Chicken
                 // Objects ohne DrawAll: 1 Portion -> erstes Stück, 2 Portionen -> beide.
                 new ItemGroupView.ComponentGroup { Item = ChickenItem, Objects = new List<GameObject> { chickenGO, chicken2GO } },
                 new ItemGroupView.ComponentGroup { Item = rice, GameObject = riceGO },
-                new ItemGroupView.ComponentGroup { Item = broccoli, GameObject = broccoliGO },
+                new ItemGroupView.ComponentGroup { Item = broccoli, Objects = new List<GameObject> { broccoliGO, broccoli2GO } },
                 new ItemGroupView.ComponentGroup { Item = lemon, GameObject = lemonGO },
-                new ItemGroupView.ComponentGroup { Item = lettuce, GameObject = lettuceGO },
             };
         }
     }

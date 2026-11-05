@@ -200,21 +200,29 @@ namespace MyChickenMod.Custom.Chicken
         public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
         public override List<Unlock> HardcodedRequirements => new List<Unlock> { Refs.BaseDish };
 
-        public override HashSet<Item> MinimumIngredients => new HashSet<Item> { Refs.Item(ItemReferences.Lettuce) };
-        public override HashSet<Process> RequiredProcesses => new HashSet<Process> { Refs.Process(ProcessReferences.Chop) };
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Item(ItemReferences.LettuceChopped));
+        // Brokkoli aus dem eigenen Topf statt Reis. Die Karte schaltet nur eine Markierung frei;
+        // ChickenOrderPatch würfelt dann für den Beilagen-Platz Reis oder Brokkoli.
+        public override HashSet<Item> MinimumIngredients => new HashSet<Item>
+        {
+            Refs.Item(ItemReferences.BroccoliRaw), Refs.Item(ItemReferences.Pot), Refs.Item(ItemReferences.Water)
+        };
+        public override HashSet<Process> RequiredProcesses => new HashSet<Process>
+        {
+            Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
+        };
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.LowCarbMarker>());
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildPlate("Chicken Low Carb - Icon",
-            GDOUtils.GetCustomGameDataObject<CookedChicken>(), lettuceInsteadOfRice: true);
+            GDOUtils.GetCustomGameDataObject<CookedChicken>(), broccoliInsteadOfRice: true);
 
         public override Dictionary<Locale, string> Recipe => new Dictionary<Locale, string>
         {
-            { Locale.English, "Some customers skip the carbs: chop lettuce and serve it instead of rice." }
+            { Locale.English, "Some customers skip the carbs: serve steamed broccoli instead of rice. They may still want broccoli as a topping on top." }
         };
         public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
         {
-            Refs.Info("Low Carb", "Customers may want salad instead of rice with their chicken")
+            Refs.Info("Low Carb", "Customers may want broccoli instead of rice with their chicken")
         };
     }
 

@@ -62,4 +62,13 @@ namespace MyChickenMod.Custom.Portions
 
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
     }
+
+    // Unsichtbare Markierung: wird von der Karte "Low Carb" freigeschaltet und von ChickenOrderPatch
+    // abgefragt. Kommt in keinem Gericht vor und wird nie bestellt.
+    public class LowCarbMarker : CustomItem
+    {
+        public override string UniqueNameID => "Low Carb Marker";
+        private GameObject _prefab;
+        public override GameObject Prefab => _prefab ??= PrefabUtil.CreateRoot("Low Carb Marker");
+    }
 }
