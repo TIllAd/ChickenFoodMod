@@ -40,19 +40,32 @@ Set-Content -Path $flag -Value $lines -Encoding UTF8
 
 # 3. Spiel ueber Steam starten
 Write-Host "Starte PlateUp ..." -ForegroundColor Cyan
+$startTime = Get-Date
 Start-Process "steam://rungameid/1599600"
 
 # 4. Warten; Lebenszeichen des Test-Mods aus dem Spiel-Log anzeigen
 $log = Join-Path $env:USERPROFILE "AppData\LocalLow\It's Happening\PlateUp\Player.log"
 $shown = 0
+$injected = $false
+$lastKey = 0
+$wsh = New-Object -ComObject WScript.Shell
 $sw = [Diagnostics.Stopwatch]::StartNew()
 while (-not (Test-Path $done)) {
+    # Titelbildschirm "Press any button": PlateUp laedt Mods erst nach einem Tastendruck.
+    if (-not $injected -and (Test-Path $log) -and (Get-Item $log).LastWriteTime -gt $startTime) {
+        $injected = [bool](Select-String -Path $log -SimpleMatch "Injecting" -Quiet -ErrorAction SilentlyContinue)
+        $proc = Get-Process -Name PlateUp -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $injected -and $proc -and $proc.MainWindowHandle -ne 0 -and $sw.Elapsed.TotalSeconds - $lastKey -gt 4 -and $sw.Elapsed.TotalSeconds -gt 15) {
+            $lastKey = $sw.Elapsed.TotalSeconds
+            if ($wsh.AppActivate($proc.Id)) { Start-Sleep -Milliseconds 300; $wsh.SendKeys("{ENTER}") }
+        }
+    }
     if ($sw.Elapsed.TotalSeconds -gt $TimeoutSec) {
         Remove-Item $flag -ErrorAction SilentlyContinue
         throw "Kein Ergebnis nach $TimeoutSec s. Player.log pruefen: $log"
     }
     Start-Sleep -Seconds 2
-    if ((Test-Path $log) -and (Get-Item $log).LastWriteTime -gt (Get-Date).AddMinutes(-10)) {
+    if ((Test-Path $log) -and (Get-Item $log).LastWriteTime -gt $startTime) {
         $lines = @(Get-Content $log -ErrorAction SilentlyContinue | Select-String -SimpleMatch "[ModSelfTest]")
         if ($lines.Count -lt $shown) { $shown = 0 }
         for ($i = $shown; $i -lt $lines.Count; $i++) { Write-Host ("  " + $lines[$i].Line) }
