@@ -42,17 +42,23 @@ Set-Content -Path $flag -Value $lines -Encoding UTF8
 Write-Host "Starte PlateUp ..." -ForegroundColor Cyan
 Start-Process "steam://rungameid/1599600"
 
-# 4. Warten
+# 4. Warten; Lebenszeichen des Test-Mods aus dem Spiel-Log anzeigen
+$log = Join-Path $env:USERPROFILE "AppData\LocalLow\It's Happening\PlateUp\Player.log"
+$shown = 0
 $sw = [Diagnostics.Stopwatch]::StartNew()
 while (-not (Test-Path $done)) {
     if ($sw.Elapsed.TotalSeconds -gt $TimeoutSec) {
         Remove-Item $flag -ErrorAction SilentlyContinue
-        throw "Kein Ergebnis nach $TimeoutSec s. Player.log pruefen: $env:USERPROFILE\AppData\LocalLow\It's Happening\PlateUp\Player.log"
+        throw "Kein Ergebnis nach $TimeoutSec s. Player.log pruefen: $log"
     }
     Start-Sleep -Seconds 2
-    Write-Host -NoNewline "."
+    if ((Test-Path $log) -and (Get-Item $log).LastWriteTime -gt (Get-Date).AddMinutes(-10)) {
+        $lines = @(Get-Content $log -ErrorAction SilentlyContinue | Select-String -SimpleMatch "[ModSelfTest]")
+        if ($lines.Count -lt $shown) { $shown = 0 }
+        for ($i = $shown; $i -lt $lines.Count; $i++) { Write-Host ("  " + $lines[$i].Line) }
+        $shown = $lines.Count
+    }
 }
-Write-Host ""
 Write-Host ("Fertig nach {0:0} s" -f $sw.Elapsed.TotalSeconds) -ForegroundColor Green
 
 # 5. Ergebnis

@@ -14,39 +14,42 @@ using UnityEngine;
 // (legt run-selftest.ps1 an). Sonst macht der Mod gar nichts.
 namespace ModSelfTest
 {
-    public class Main : IModInitializer
+    // Läuft als Spiel-System (tickt garantiert jeden Frame, auch im Hauptmenü).
+    public class SelfTestSystem : GenericSystemBase, IModSystem
     {
-        public void PostActivate(KitchenMods.Mod mod)
+        private bool _active;
+        private bool _done;
+        private float _dataSeenAt = -1f;
+        private float _lastHeartbeat;
+
+        protected override void Initialise()
         {
-            if (!File.Exists(SelfTest.FlagPath)) return;
-            var go = new GameObject("ModSelfTest Runner");
-            UnityEngine.Object.DontDestroyOnLoad(go);
-            go.AddComponent<SelfTestRunner>();
-            Debug.LogWarning("[ModSelfTest] Flag gefunden, Selbsttest startet sobald die Spieldaten geladen sind.");
+            base.Initialise();
+            _active = File.Exists(SelfTest.FlagPath);
+            if (_active) Debug.LogWarning("[ModSelfTest] Flag gefunden, Selbsttest startet sobald die Spieldaten geladen sind.");
         }
 
-        public void PreInject() { }
-        public void PostInject() { }
-    }
-
-    public class SelfTestRunner : MonoBehaviour
-    {
-        private float _dataSeenAt = -1f;
-        private bool _done;
-
-        private void Update()
+        protected override void OnUpdate()
         {
-            if (_done) return;
-            if (GameData.Main == null || GameData.Main.ItemSetView == null) return;
-            if (_dataSeenAt < 0f) _dataSeenAt = Time.realtimeSinceStartup;
+            if (!_active || _done) return;
+            float now = UnityEngine.Time.realtimeSinceStartup;
+            bool ready = GameData.Main != null && GameData.Main.ItemSetView != null;
+            if (now - _lastHeartbeat > 5f)
+            {
+                _lastHeartbeat = now;
+                Debug.LogWarning($"[ModSelfTest] warte ... Spieldaten bereit: {ready}, t={now:0}s");
+            }
+            if (!ready) return;
+            if (_dataSeenAt < 0f) _dataSeenAt = now;
             // Ein paar Sekunden warten, bis Menü, Shader und Kamera-Setup stehen.
-            if (Time.realtimeSinceStartup - _dataSeenAt < 8f) return;
+            if (now - _dataSeenAt < 8f) return;
             _done = true;
 
             bool quit = true;
             try
             {
-                var flag = File.ReadAllLines(SelfTest.FlagPath).Select(l => l.Trim()).Where(l => l.Length > 0).ToList();
+                Debug.LogWarning("[ModSelfTest] Test läuft ...");
+                var flag = File.ReadAllLines(SelfTest.FlagPath).Select(l => l.Trim().Trim('\uFEFF')).Where(l => l.Length > 0).ToList();
                 quit = !flag.Any(l => l.Equals("noquit", StringComparison.OrdinalIgnoreCase));
                 var prefixes = flag.Where(l => !l.Equals("noquit", StringComparison.OrdinalIgnoreCase)).ToList();
                 if (prefixes.Count == 0) prefixes.Add("TillAd.PlateUp.");
