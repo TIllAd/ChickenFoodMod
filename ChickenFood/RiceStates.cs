@@ -37,7 +37,7 @@ namespace MyChickenMod.Custom.Rice
         protected virtual bool Cools => false;
 
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        public override Item SplitSubItem => Ref(ItemReferences.RiceContainerCooked);
+        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
         public override int SplitCount => RiceTuning.Portions;
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
         public override Item DisposesTo => Ref(ItemReferences.Pot);
@@ -96,7 +96,7 @@ namespace MyChickenMod.Custom.Rice
     {
         public override string UniqueNameID => "Rice - Cold Pot";
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        public override Item SplitSubItem => Ref(ItemReferences.RiceContainerCooked);
+        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
         public override int SplitCount => RiceTuning.Portions;
         public override bool PreventExplicitSplit => true;
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };

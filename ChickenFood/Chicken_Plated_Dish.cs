@@ -55,7 +55,7 @@ namespace MyChickenMod.Custom.Chicken
         };
         public override HashSet<Process> RequiredProcesses => new HashSet<Process> { Refs.Process(ProcessReferences.Cook) };
         // Reis ist jetzt eine freischaltbare Beilage (Low Carb kann Salat danebenlegen) -> hier standardmäßig freischalten.
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Item(ItemReferences.RiceContainerCooked));
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.RicePortion>());
 
         public override List<Dish.MenuItem> ResultingMenuItems => new List<Dish.MenuItem>
         {
@@ -131,7 +131,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
         };
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Item(ItemReferences.BroccoliChoppedContainerCooked));
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>());
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildItemIcon("Chicken Broccoli - Icon", ItemReferences.BroccoliChopped);
