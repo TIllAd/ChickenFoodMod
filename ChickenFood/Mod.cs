@@ -60,7 +60,6 @@ namespace MyChickenMod
             AddGameDataObject<BurntRiceCard>();
 
             // Kosmetik
-            AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenHeadHat>();
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.SweatbandHat>();
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenChefHat>();
             AddGameDataObject<MyChickenMod.Custom.Cosmetics.ChickenCostume>();

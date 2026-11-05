@@ -161,15 +161,37 @@ namespace MyChickenMod.Custom.Cosmetics
             }
         }
 
+        // Einzelne Materialien tauschen (z. B. nur das Weiß, das Band bleibt).
+        public static void ReplaceMaterials(GameObject root, Func<Material, Material> rule)
+        {
+            foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var mats = r.sharedMaterials;
+                bool changed = false;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    if (mats[i] == null) continue;
+                    var m = rule(mats[i]);
+                    if (m != null) { mats[i] = m; changed = true; }
+                }
+                if (changed) r.sharedMaterials = mats;
+            }
+        }
+
         // Ärmel entfernen: alle Dreiecke weg, die überwiegend an Oberarm/Unterarm/Hand hängen.
         public static void CutSleeves(SkinnedMeshRenderer r)
         {
-            if (r == null || r.sharedMesh == null || r.bones == null || r.bones.Length == 0) return;
+            if (r == null || r.sharedMesh == null) return;
+            if (r.bones == null || r.bones.Length == 0)
+            {
+                Mod.LogWarning($"[Cosmetics] CutSleeves {r.name}: keine Knochen am Prefab -> nichts geschnitten");
+                return;
+            }
             var mesh = UnityEngine.Object.Instantiate(r.sharedMesh);
             mesh.name = r.sharedMesh.name + " (sleeveless)";
             var bones = r.bones;
             bool IsArm(int i) => i >= 0 && i < bones.Length && bones[i] != null &&
-                (bones[i].name.StartsWith("UpperArm") || bones[i].name.StartsWith("LowerArm") || bones[i].name.StartsWith("Hand"));
+                (bones[i].name.StartsWith("Shoulder") || bones[i].name.StartsWith("UpperArm") || bones[i].name.StartsWith("LowerArm") || bones[i].name.StartsWith("Hand"));
             var w = mesh.boneWeights;
             var arm = new bool[w.Length];
             for (int i = 0; i < w.Length; i++)
@@ -190,6 +212,9 @@ namespace MyChickenMod.Custom.Cosmetics
                 }
                 mesh.SetTriangles(keep, sub);
             }
+            int armVerts = arm.Count(a => a);
+            Mod.LogWarning($"[Cosmetics] CutSleeves {r.name}: {bones.Length} Knochen ({string.Join(",", bones.Where(b => b != null).Select(b => b.name))}), " +
+                           $"{armVerts}/{arm.Length} Arm-Vertices, Dreiecke {r.sharedMesh.triangles.Length / 3} -> {mesh.triangles.Length / 3}");
             r.sharedMesh = mesh;
         }
 
@@ -224,29 +249,6 @@ namespace MyChickenMod.Custom.Cosmetics
     }
 
     // ================================================================== Hüte
-    public class ChickenHeadHat : CustomPlayerCosmetic
-    {
-        public override string UniqueNameID => "Chicken Head Hat";
-        public override CosmeticType CosmeticType => CosmeticType.Hat;
-        public override List<(Locale, CosmeticInfo)> InfoList => new List<(Locale, CosmeticInfo)>
-        {
-            (Locale.English, new CosmeticInfo { Name = "Chicken Head", Description = "Winner winner, chicken dinner." })
-        };
-
-        private GameObject _visual;
-        public override GameObject Visual => _visual ??= Make();
-
-        private static GameObject Make()
-        {
-            var root = PrefabUtil.CreateRoot("ChickenFood Chicken Head Hat");
-            var comp = root.AddComponent<PlayerOutfitComponent>();
-            comp.Renderers = new List<SkinnedMeshRenderer>();
-            comp.Hats = new List<Renderer>();
-            CosmeticUtil.AddChickenHead(CosmeticUtil.HeadAttachment(root));
-            return root;
-        }
-    }
-
     public class SweatbandHat : CustomPlayerCosmetic
     {
         public override string UniqueNameID => "Sweatband";
@@ -291,6 +293,8 @@ namespace MyChickenMod.Custom.Cosmetics
         private static GameObject Make()
         {
             var root = CosmeticUtil.Clone(VanillaCosmetics.TallChefHat, "ChickenFood Chicken Chef Hat");
+            // Original ist eher grau ("Clothing White") -> reines Weiß, damit er nicht wie ein Eimer wirkt.
+            CosmeticUtil.ReplaceMaterials(root, m => m.name.Contains("Clothing White") ? Mat.Flat("Hat White", new Color(1f, 1f, 1f), 0.1f) : null);
             // Kleiner Hühnchen-Anstecker vorn an der Mütze.
             var pin = new GameObject("Chicken Pin");
             pin.transform.SetParent(CosmeticUtil.HeadAttachment(root), false);
@@ -312,7 +316,7 @@ namespace MyChickenMod.Custom.Cosmetics
         public override CosmeticType CosmeticType => CosmeticType.Outfit;
         public override List<(Locale, CosmeticInfo)> InfoList => new List<(Locale, CosmeticInfo)>
         {
-            (Locale.English, new CosmeticInfo { Name = "Chicken Costume", Description = "Why did the chef cross the kitchen?" })
+            (Locale.English, new CosmeticInfo { Name = "Chicken Costume", Description = "Best worn with the rooster hat." })
         };
 
         private GameObject _visual;
@@ -328,7 +332,6 @@ namespace MyChickenMod.Custom.Cosmetics
                 n.Contains("Helmet") || n.Contains("Tank") || n.Contains("Pack") ? (true, null) :
                 n.Contains("Boots") ? (false, yellow) :
                 (false, white));
-            CosmeticUtil.AddChickenHead(CosmeticUtil.HeadAttachment(root));
             return root;
         }
     }
