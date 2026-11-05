@@ -30,6 +30,13 @@ Ideen zum Ergänzen der aktuellen Liste („Rice Rice Baby“, „Wing It“, �
 - **Cutting Season:** 2× Chicken **ohne** Reis (Gegenstück zu Bulking; Bulking bestellt bewusst immer Reis).
 - **Leg Day:** Kunden laufen langsamer – witzig, spielerisch fragwürdig. 🤔
 
+### 💡 Kleidung / Kosmetik
+Wie bei Breaking Plates: Outfits aus dem Spiel umfärben bzw. einfache Formen prozedural bauen.
+- **Hühnerkopf-Mütze** (Kamm + Schnabel) – Favorit: einfach, sofort erkennbar, gutes Workshop-Vorschaubild.
+- Ganzes Hühnerkostüm (gelb-weiß, Federn) – mehr Aufwand, lustig im Koop.
+- Gym-Look: Stirnband + Tanktop, Gewichthebergürtel, 80er-Neon-Trainingsanzug.
+- Küche: Schürze in Mod-Farben / mit Reisschale, hohe Kochmütze mit Hühnchen-Anstecker.
+
 ---
 
 ## Reis & Beilagen
