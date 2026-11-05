@@ -112,6 +112,7 @@ namespace ModSelfTest
             foreach (var a in targets.OfType<Appliance>()) TestAppliance(a);
             foreach (var d in targets.OfType<Dish>()) TestDishCard(d);
             foreach (var c in targets.OfType<UnlockCard>()) TestUnlockCard(c);
+            foreach (var k in targets.OfType<PlayerCosmetic>()) TestCosmetic(k);
             foreach (var p in targets.OfType<Process>())
                 Add(p, "Prozesse", Short(p.name), "INFO", "eigener Prozess", null);
 
@@ -387,6 +388,17 @@ namespace ModSelfTest
                 $"<b>{Enc(SafeName(c))}</b> ({c.CardType}, {c.UnlockGroup})<br>{Enc(SafeDesc(c))}<br><small>{effects}</small>{Requires(c)}", null);
         }
 
+        // Kosmetik so rendern wie die Garderobe im Spiel (Spielerfigur mit angezogenem Teil).
+        private void TestCosmetic(PlayerCosmetic c)
+        {
+            string subject = Short(c.name);
+            if (c.Visual == null) { Add(c, "Kosmetik", subject, "FAIL", "kein Visual", null); return; }
+            string name = subject;
+            try { name = c.Info?.Get(Locale.English)?.Name ?? subject; } catch { }
+            Add(c, "Kosmetik", subject, "PASS", $"<b>{Enc(name)}</b> ({c.CosmeticType})",
+                Render(() => PrefabSnapshot.GetCosmeticSnapshot(c, ImageSize, ImageSize)));
+        }
+
         private string Requires(Unlock u) =>
             u.Requires != null && u.Requires.Count > 0
                 ? $"<br><small>benötigt: {Enc(string.Join(", ", u.Requires.Where(r => r != null).Select(r => SafeName(r))))}</small>"
@@ -489,7 +501,7 @@ namespace ModSelfTest
                 h.Append("</div>");
             }
 
-            string[] order = { "Karten", "Bestellungen", "Kombinationen (Bilder)", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
+            string[] order = { "Karten", "Kosmetik", "Bestellungen", "Kombinationen (Bilder)", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
             foreach (var mod in _entries.Select(e => e.Mod).Distinct().OrderBy(m => m))
             {
                 h.Append($"<h2>{Enc(mod)}</h2>");
