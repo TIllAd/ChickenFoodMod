@@ -26,6 +26,8 @@ namespace MyChickenMod.Custom.Cosmetics
         public const int ButcherChef = -1627755214;
         public const int AstronautChef = 20631900;
         public const int DiverChef = -950136670;
+        public const int MushroomChef = 1350673715;
+        public const int SkeletonChef = -1058807536;
     }
 
     internal static class Palette
@@ -159,6 +161,32 @@ namespace MyChickenMod.Custom.Cosmetics
                 for (int i = 0; i < mats.Length; i++) mats[i] = mat;
                 r.sharedMaterials = mats;
             }
+        }
+
+        // Ein Teil (z. B. Gürtel) aus einem anderen Spiel-Outfit dazunehmen. Alle Outfits hängen am
+        // selben Skelett, die Knochen werden beim Anziehen ohnehin neu zugewiesen.
+        public static SkinnedMeshRenderer Borrow(GameObject root, int vanillaId, string partName, Material mat)
+        {
+            var source = ((PlayerCosmetic)GDOUtils.GetExistingGDO(vanillaId)).Visual;
+            SkinnedMeshRenderer part = null;
+            foreach (var r in source.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                if (r.gameObject.name == partName) { part = r; break; }
+            if (part == null) { Mod.LogWarning($"[Cosmetics] Teil '{partName}' nicht gefunden"); return null; }
+            var target = root.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            var anchor = target.Length > 0 ? target[0].transform.parent : root.transform;
+            var copy = UnityEngine.Object.Instantiate(part.gameObject, anchor, false);
+            copy.name = partName;
+            foreach (Transform child in copy.transform) UnityEngine.Object.DestroyImmediate(child.gameObject);
+            var smr = copy.GetComponent<SkinnedMeshRenderer>();
+            if (target.Length > 0) { smr.rootBone = target[0].rootBone; smr.bones = target[0].bones; }
+            if (mat != null)
+            {
+                var mats = smr.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++) mats[i] = mat;
+                smr.sharedMaterials = mats;
+            }
+            root.GetComponent<PlayerOutfitComponent>()?.Renderers?.Add(smr);
+            return smr;
         }
 
         // Einzelne Materialien tauschen (z. B. nur das Weiß, das Band bleibt).
@@ -350,15 +378,13 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
-            // Tanktop = Hemd mit abgeschnittenen Ärmeln; dazu schwarze Hose und Gewichthebergürtel.
-            var root = CosmeticUtil.Clone(VanillaCosmetics.HandymanChef, "ChickenFood Gym Outfit");
+            // Vorlage: Pilz-Kostüm = ärmelloses Oberteil + kurze Hose. Umhang/Hut weg, Gürtel vom Handwerker dazu.
+            var root = CosmeticUtil.Clone(VanillaCosmetics.MushroomChef, "ChickenFood Gym Outfit");
             CosmeticUtil.Restyle(root, n =>
-                n.Contains("Hat") ? (true, null) :
-                n.Contains("Belt") ? (false, Mat.Flat("Belt Brown", Palette.BeltBrown, 0.3f)) :
+                n.Contains("Cape") || n.Contains("Hat") ? (true, null) :
                 n.Contains("Trousers") ? (false, Mat.Flat("Gym Black", Palette.GymBlack)) :
                 (false, Mat.Flat("Tank White", Palette.TankWhite)));
-            foreach (var r in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-                if (r.gameObject.name == "Handyman Chef") CosmeticUtil.CutSleeves(r);
+            CosmeticUtil.Borrow(root, VanillaCosmetics.HandymanChef, "Handyman Chef Belt", Mat.Flat("Belt Brown", Palette.BeltBrown, 0.3f));
             return root;
         }
     }
@@ -377,11 +403,10 @@ namespace MyChickenMod.Custom.Cosmetics
 
         private static GameObject Make()
         {
-            // Ganzkörper-Anzug: Taucher-Outfit ohne Helm/Flaschen/Handschuhe, neon, weiße Schuhe.
-            var root = CosmeticUtil.Clone(VanillaCosmetics.DiverChef, "ChickenFood Retro Tracksuit");
+            // Vorlage: Skelett-Kostüm = Ganzkörperanzug; Knochen sind nur Textur und verschwinden beim Umfärben.
+            var root = CosmeticUtil.Clone(VanillaCosmetics.SkeletonChef, "ChickenFood Retro Tracksuit");
             CosmeticUtil.Restyle(root, n =>
-                n.Contains("Helmet") || n.Contains("Tank") || n.Contains("Gloves") ? (true, null) :
-                n.Contains("Boots") ? (false, Mat.Flat("Shirt White", Palette.ShirtWhite)) :
+                n.Contains("Hat") || n.Contains("Skull") ? (true, null) :
                 (false, Mat.Flat("Neon Pink", Palette.NeonPink, 0.4f)));
             return root;
         }
