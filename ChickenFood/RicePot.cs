@@ -77,10 +77,45 @@ namespace MyChickenMod.Custom.Rice
     }
 
     // Gekochter Reistopf: 5 Portionen. Portion = der Reis-Haufen aus dem Spiel ("Rice - Container Cooked").
-    // Ohne Reis-Karten bleibt es bei diesem Item; mit "Burnt Rice"/"Cold Rice" tauscht RicePotStateSystem
-    // den Topf gegen eine Variante, die anbrennt bzw. abkühlt (siehe RiceStates.cs).
-    public class RiceCookedPot : RiceCookedPotBase
+    public class RiceCookedPot : CustomItem
     {
         public override string UniqueNameID => "Rice - Cooked Pot";
+        public override ItemStorage ItemStorageFlags => ItemStorage.None;
+        // Portion = eigenes Item (nicht die Wok-Zutat des Spiels, sonst entsteht ein Wok-Gericht).
+        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
+        public override int SplitCount => 5;
+        public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
+        public override Item DisposesTo => Ref(ItemReferences.Pot);
+
+        public override string ColourBlindTag => "R";
+
+        private static readonly Vector3 RiceFull = new Vector3(0f, 0.15f, 0f);
+        private static readonly Vector3 RiceEmpty = new Vector3(0f, -0.05f, 0f);
+
+        private GameObject _prefab;
+        public override GameObject Prefab
+        {
+            get
+            {
+                if (_prefab == null)
+                {
+                    _prefab = PrefabUtil.CreateRoot("Rice Cooked Pot");
+                    var pot = Ref(ItemReferences.Pot).Prefab;
+                    PrefabUtil.CloneVisual(pot.transform.Find("Pot").gameObject, _prefab.transform, "Pot", Vector3.zero);
+                    var rice = PrefabUtil.CloneVisual(Ref(ItemReferences.RiceContainerCooked).Prefab, _prefab.transform, "Rice",
+                        RiceFull, 1.4f);
+                    RicePot.RemoveBowl(rice);
+
+                    // Reis sinkt im Topf ab, je mehr Portionen entnommen werden (wie bei Suppe).
+                    var view = _prefab.AddComponent<PositionSplittableView>();
+                    ReflectionUtils.GetField<PositionSplittableView>("FullPosition").SetValue(view, RiceFull);
+                    ReflectionUtils.GetField<PositionSplittableView>("EmptyPosition").SetValue(view, RiceEmpty);
+                    ReflectionUtils.GetField<PositionSplittableView>("Objects").SetValue(view, new List<GameObject> { rice });
+                }
+                return _prefab;
+            }
+        }
+
+        private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
     }
 }

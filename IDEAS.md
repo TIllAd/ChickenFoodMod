@@ -104,12 +104,13 @@ Gelernt:
 - ❌ Air Fryer – genug Anbratmöglichkeiten im Spiel.
 - ❌ Gekochtes Ei als Topping – steht allein im Raum; Ei eher im Fried Rice.
 - ❌ Salat statt Reis (Low Carb) – kollidiert mit dem Spiel-Salat; jetzt Brokkoli.
+- ❌ Burnt Rice – im Spiel brennt nichts an, was im Topf kocht (Suppe, Brokkoli …); außerdem hängt der rote Balken am selben Merkmal wie die Feuergefahr. Code im Git-Verlauf (Branch `feature/new-cards`, vor dem Entfernen).
 
 ---
 
 ## Erledigt
 - ✅ v1.0.1: eigene Reis-/Brokkoli-Portionen (Stir-Fry-Bug).
-- ✅ (1.1.0, Branch `feature/new-cards`): Low Carb, Bulking Season, Burnt Rice, keine Kundenreduktion beim Grundgericht.
+- ✅ (1.1.0, Branch `feature/new-cards`): Low Carb, Bulking Season, keine Kundenreduktion beim Grundgericht.
 
 ---
 
