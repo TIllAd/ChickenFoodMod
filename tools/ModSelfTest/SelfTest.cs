@@ -113,6 +113,7 @@ namespace ModSelfTest
             foreach (var d in targets.OfType<Dish>()) TestDishCard(d);
             foreach (var c in targets.OfType<UnlockCard>()) TestUnlockCard(c);
             foreach (var k in targets.OfType<PlayerCosmetic>()) TestCosmetic(k);
+            if (targets.OfType<PlayerCosmetic>().Any()) TestReferenceCosmetics();
             foreach (var p in targets.OfType<Process>())
                 Add(p, "Prozesse", Short(p.name), "INFO", "eigener Prozess", null);
 
@@ -395,8 +396,41 @@ namespace ModSelfTest
             if (c.Visual == null) { Add(c, "Kosmetik", subject, "FAIL", "kein Visual", null); return; }
             string name = subject;
             try { name = c.Info?.Get(Locale.English)?.Name ?? subject; } catch { }
-            Add(c, "Kosmetik", subject, "PASS", $"<b>{Enc(name)}</b> ({c.CosmeticType})",
+            Add(c, "Kosmetik", subject, "PASS", $"<b>{Enc(name)}</b> ({c.CosmeticType})<br><small>{DescribeRenderers(c.Visual)}</small>",
                 Render(() => PrefabSnapshot.GetCosmeticSnapshot(c, ImageSize, ImageSize)));
+        }
+
+        // Diagnose: welche Teile, Shader und Farb-Eigenschaften ein Kosmetik-Prefab hat.
+        private static string DescribeRenderers(GameObject go)
+        {
+            var sb = new StringBuilder();
+            foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+            {
+                sb.Append(Enc(r.gameObject.name)).Append(r is SkinnedMeshRenderer ? " [skinned]" : "").Append(": ");
+                foreach (var m in r.sharedMaterials)
+                {
+                    if (m == null) { sb.Append("null; "); continue; }
+                    sb.Append(Enc(m.name)).Append(" / ").Append(Enc(m.shader != null ? m.shader.name : "?"));
+                    foreach (var prop in new[] { "_Color0", "_Color", "_BaseColor", "_Color1", "_Color2" })
+                        if (m.HasProperty(prop)) sb.Append(" ").Append(prop).Append("=").Append(ColorUtility.ToHtmlStringRGB(m.GetColor(prop)));
+                    sb.Append("; ");
+                }
+                sb.Append("<br>");
+            }
+            return sb.ToString();
+        }
+
+        // Spiel-Kosmetik als Vorlage zum Vergleich mitrendern (nur die, die unsere Teile verwenden).
+        private static readonly int[] ReferenceCosmetics = { -856773417, -545572929, -1859499757, -1776995498, -2013127355, -1627755214 };
+        private void TestReferenceCosmetics()
+        {
+            foreach (int id in ReferenceCosmetics)
+            {
+                if (!_data.TryGet<PlayerCosmetic>(id, out var c) || c.Visual == null) continue;
+                _entries.Add(new Entry { Mod = "Spiel (Vorlagen)", Section = "Kosmetik", Subject = c.name, Status = "INFO",
+                    Message = $"<b>{Enc(c.name)}</b><br><small>{DescribeRenderers(c.Visual)}</small>",
+                    Image = Render(() => PrefabSnapshot.GetCosmeticSnapshot(c, ImageSize, ImageSize)) });
+            }
         }
 
         private string Requires(Unlock u) =>
