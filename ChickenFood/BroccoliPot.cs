@@ -70,8 +70,8 @@ namespace MyChickenMod.Custom.Broccoli
     {
         public override string UniqueNameID => "Broccoli - Steamed Pot";
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        // Portion = gegarter geschnittener Brokkoli aus dem Spiel (wie beim Wok-Gericht), keine Beilage.
-        public override Item SplitSubItem => Ref(ItemReferences.BroccoliChoppedContainerCooked);
+        // Portion = eigenes Item (nicht die Wok-Zutat des Spiels, sonst entsteht ein Wok-Gericht).
+        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>().GameDataObject;
         public override int SplitCount => 5;
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
         public override Item DisposesTo => Ref(ItemReferences.Pot);

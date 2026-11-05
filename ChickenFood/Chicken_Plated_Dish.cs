@@ -28,7 +28,8 @@ namespace MyChickenMod.Custom.Chicken
         public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
         public override int Difficulty => 2;
         public override bool IsAvailableAsLobbyOption => true;
-        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
+        // Einfaches Gericht -> keine Kundenreduktion (Feedback aus dem Workshop).
+        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.None;
         public override List<string> StartingNameSet => new List<string>
         {
             "Chicken & Rice", "Rice Rice Baby", "Wing It", "Cluck & Cook", "The Rice Is Right", "Fowl Play"
@@ -126,7 +127,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
         };
-        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Item(ItemReferences.BroccoliChoppedContainerCooked));
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>());
 
         private GameObject _icon;
         public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildItemIcon("Chicken Broccoli - Icon", ItemReferences.BroccoliChopped);

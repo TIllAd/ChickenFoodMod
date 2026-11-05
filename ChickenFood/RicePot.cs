@@ -81,7 +81,8 @@ namespace MyChickenMod.Custom.Rice
     {
         public override string UniqueNameID => "Rice - Cooked Pot";
         public override ItemStorage ItemStorageFlags => ItemStorage.None;
-        public override Item SplitSubItem => Ref(ItemReferences.RiceContainerCooked);
+        // Portion = eigenes Item (nicht die Wok-Zutat des Spiels, sonst entsteht ein Wok-Gericht).
+        public override Item SplitSubItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
         public override int SplitCount => 5;
         public override List<Item> SplitDepletedItems => new List<Item> { Ref(ItemReferences.Pot) };
         public override Item DisposesTo => Ref(ItemReferences.Pot);

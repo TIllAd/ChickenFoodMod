@@ -17,7 +17,8 @@ namespace MyChickenMod.Custom.Chicken
         protected abstract string PrefabName { get; }
 
         protected static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
-        protected static Item SteamedBroccoliItem => Ref(ItemReferences.BroccoliChoppedContainerCooked);
+        protected static Item SteamedBroccoliItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>().GameDataObject;
+        protected static Item RiceItem => (Item)GDOUtils.GetCustomGameDataObject<MyChickenMod.Custom.Portions.RicePortion>().GameDataObject;
 
         public override Item DirtiesTo => Ref(ItemReferences.PlateDirty);
         public override Item DisposesTo => Ref(ItemReferences.Plate);
@@ -28,7 +29,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             new ItemGroup.ItemSet { Min = 1, Max = 1, IsMandatory = true, Items = new List<Item> { Ref(ItemReferences.Plate) } },
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { ChickenItem } },
-            new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { Ref(ItemReferences.RiceContainerCooked) } },
+            new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { RiceItem } },
             // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
             // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
@@ -71,8 +72,8 @@ namespace MyChickenMod.Custom.Chicken
         public override void OnRegister(ItemGroup gdo)
         {
             var chickenGO = PrefabUtil.AddChicken(Prefab.transform, ChickenCustom);
-            var rice = Ref(ItemReferences.RiceContainerCooked);
-            var riceGO = PrefabUtil.CloneVisual(rice.Prefab, Prefab.transform, "Rice", PrefabUtil.RicePos, 1.1f);
+            var rice = RiceItem;
+            var riceGO = PrefabUtil.CloneVisual(Ref(ItemReferences.RiceContainerCooked).Prefab, Prefab.transform, "Rice", PrefabUtil.RicePos, 1.1f);
             // Topping = Portion aus unserem Brokkoli-Topf; Optik: die geschnittenen Röschen.
             var broccoli = SteamedBroccoliItem;
             var broccoliGO = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, Prefab.transform, "Broccoli", new Vector3(-0.1f, 0.02f, -0.12f), 0.8f);

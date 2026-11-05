@@ -14,7 +14,7 @@ namespace MyChickenMod
     {
         public const string MOD_GUID = "TillAd.PlateUp.ChickenAndRice";
         public const string MOD_NAME = "Chicken & Rice";
-        public const string MOD_VERSION = "1.0.0";
+        public const string MOD_VERSION = "1.0.1";
         public const string MOD_AUTHOR = "Till";
         public const string MOD_GAMEVERSION = ">=1.1.4";
 
@@ -38,6 +38,8 @@ namespace MyChickenMod
             // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
+            AddGameDataObject<MyChickenMod.Custom.Portions.RicePortion>();
+            AddGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>();
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RicePot>();
             AddGameDataObject<SteamedBroccoliPot>();
