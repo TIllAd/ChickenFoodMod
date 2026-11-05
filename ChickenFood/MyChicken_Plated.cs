@@ -22,7 +22,8 @@ namespace MyChickenMod.Custom.Chicken
 
         public override Item DirtiesTo => Ref(ItemReferences.PlateDirty);
         public override Item DisposesTo => Ref(ItemReferences.Plate);
-        public override ItemValue ItemValue => ItemValue.Medium;
+        // Grundwert 3 + 2 pro Chicken: normaler Teller 5 Münzen (wie vorher Medium), Bulking (2x Chicken) 7.
+        public override ItemValue ItemValue => ItemValue.Small;
         public override bool CanContainSide => true;
 
         public override List<ItemGroup.ItemSet> Sets => new List<ItemGroup.ItemSet>
@@ -53,6 +54,7 @@ namespace MyChickenMod.Custom.Chicken
 
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
         {
+            new ItemGroup.ItemReward { Item = ChickenItem, RewardAmount = 2 },
             new ItemGroup.ItemReward { Item = SteamedBroccoliItem, RewardAmount = 1 },
             new ItemGroup.ItemReward { Item = Ref(ItemReferences.LemonSliced), RewardAmount = 1 },
         };

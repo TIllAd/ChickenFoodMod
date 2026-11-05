@@ -55,40 +55,35 @@ namespace MyChickenMod
             set.RequiresUnlock && set.Items.Count > 0 && set.Items.All(i => i != null &&
                 group.DerivedSets.Any(o => !o.RequiresUnlock && o.Items.Any(x => x != null && x.ID == i.ID)));
 
-        // Chicken-Sets stehen vor dem Beilagen-Platz, sind beim Würfeln also schon drin.
-        private static int CountChicken(ItemList items, ItemGroup group)
-        {
-            var chickenIds = new HashSet<int>();
-            foreach (var set in group.DerivedSets)
-                if (set.Min >= 1 && set.Items.Count == 1 && set.Items[0] != null && set.Items[0].ID != _rice
-                    && group.DerivedSets.Count(o => o.Items.Count == 1 && o.Items[0] != null && o.Items[0].ID == set.Items[0].ID) >= 2)
-                    chickenIds.Add(set.Items[0].ID);
-            int n = 0;
-            foreach (int id in items) if (chickenIds.Contains(id)) n++;
-            return n;
-        }
+        // Anteil der Bestellungen je Karte (schließen sich gegenseitig aus, Rest = normal).
+        public const float BulkingShare = 0.25f;
+        public const float LowCarbShare = 0.25f;
 
         public static ItemList Build(ItemGroup group, HashSet<int> available)
         {
+            // Erst die Art der Bestellung würfeln: Bulking (2x Chicken + Reis), Low Carb (Brokkoli statt Reis) oder normal.
+            float roll = Random.value;
+            bool bulking = available.Contains(_bulkingMarker) && roll < BulkingShare;
+            bool lowCarb = !bulking && available.Contains(_marker) && roll >= BulkingShare && roll < BulkingShare + LowCarbShare;
+
             ItemList result = default;
             foreach (var set in group.DerivedSets)
             {
-                // Beilagen-Platz: genau eins von Reis / (mit Low Carb) Brokkoli.
+                // Beilagen-Platz: Reis, bei Low Carb Brokkoli.
                 if (set.Items.Any(i => i != null && i.ID == _rice))
                 {
-                    var choices = new List<int> { _rice };
-                    // Bulking (2x Chicken) will Kohlenhydrate -> dann immer Reis.
-                    if (available.Contains(_marker) && CountChicken(result, group) < 2) choices.Add(_broccoli);
-                    result.Add(choices[Random.Range(0, choices.Count)]);
+                    result.Add(lowCarb ? _broccoli : _rice);
                     continue;
                 }
 
-                // Zweiter Chicken-Platz (Bulking Season): Chicken ist über den Pflicht-Platz immer
-                // freigeschaltet, deshalb hier nur mit der Markierung der Karte.
-                if (IsExtraPortionSet(set, group) && !available.Contains(_bulkingMarker))
+                // Zweiter Chicken-Platz: nur bei Bulking (Chicken ist über den Pflicht-Platz immer freigeschaltet).
+                if (IsExtraPortionSet(set, group))
+                {
+                    if (bulking) result.Add(set.Items[0].ID);
                     continue;
+                }
 
-                // Alles andere wie im Spiel.
+                // Alles andere (Toppings) wie im Spiel.
                 int num = Random.Range(set.Min, set.Max + 1);
                 foreach (var item in set.Items
                              .Where(i => i != null && (!set.RequiresUnlock || available.Contains(i.ID)))

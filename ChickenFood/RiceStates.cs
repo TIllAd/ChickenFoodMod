@@ -46,7 +46,9 @@ namespace MyChickenMod.Custom.Rice
                 {
                     Process = (Process)GDOUtils.GetExistingGDO(ProcessReferences.Cook),
                     Duration = RiceTuning.BurnTime,
-                    IsBad = true,
+                    // Bewusst kein "schlechter" Prozess: der würde den Herd mit Brandgefahr belegen.
+                    // Reis soll nur schwarz werden, nicht die Küche anzünden.
+                    IsBad = false,
                     Result = (Item)GDOUtils.GetCustomGameDataObject<RiceBurntPot>().GameDataObject
                 }
             }
