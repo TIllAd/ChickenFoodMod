@@ -424,10 +424,12 @@ namespace ModSelfTest
         private static readonly int[] ReferenceCosmetics = { -856773417, -545572929, -1859499757, -1776995498, -2013127355, -1627755214 };
         private void TestReferenceCosmetics()
         {
-            foreach (int id in ReferenceCosmetics)
+            // Alle Spiel-Kosmetiken (Outfits zuerst), damit man passende Vorlagen findet.
+            var all = _data.Get<PlayerCosmetic>().Where(c => c != null && c.Visual != null && !IsTarget(c))
+                .OrderBy(c => c.CosmeticType == CosmeticType.Outfit ? 0 : 1).ThenBy(c => c.name).ToList();
+            foreach (var c in all)
             {
-                if (!_data.TryGet<PlayerCosmetic>(id, out var c) || c.Visual == null) continue;
-                _entries.Add(new Entry { Mod = "Spiel (Vorlagen)", Section = "Kosmetik", Subject = c.name, Status = "INFO",
+                _entries.Add(new Entry { Mod = "Spiel (Vorlagen)", Section = c.CosmeticType == CosmeticType.Outfit ? "Outfits" : "Hüte", Subject = c.name, Status = "INFO",
                     Message = $"<b>{Enc(c.name)}</b><br><small>{DescribeRenderers(c.Visual)}</small>",
                     Image = Render(() => PrefabSnapshot.GetCosmeticSnapshot(c, ImageSize, ImageSize)) });
             }
@@ -535,7 +537,7 @@ namespace ModSelfTest
                 h.Append("</div>");
             }
 
-            string[] order = { "Karten", "Kosmetik", "Bestellungen", "Kombinationen (Bilder)", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
+            string[] order = { "Karten", "Kosmetik", "Outfits", "Hüte", "Bestellungen", "Kombinationen (Bilder)", "Kombinationen", "Items (Bilder)", "Items", "Geräte", "Prozesse" };
             foreach (var mod in _entries.Select(e => e.Mod).Distinct().OrderBy(m => m))
             {
                 h.Append($"<h2>{Enc(mod)}</h2>");
