@@ -49,6 +49,19 @@ namespace MyChickenMod
 
         public static bool IsChickenPlate(int group) => EnsureIds() && (group == _plain || group == _shredded);
 
+        // Chicken-Sets stehen vor dem Beilagen-Platz, sind beim Würfeln also schon drin.
+        private static int CountChicken(ItemList items, ItemGroup group)
+        {
+            var chickenIds = new HashSet<int>();
+            foreach (var set in group.DerivedSets)
+                if (set.Min >= 1 && set.Items.Count == 1 && set.Items[0] != null && set.Items[0].ID != _rice
+                    && group.DerivedSets.Count(o => o.Items.Count == 1 && o.Items[0] != null && o.Items[0].ID == set.Items[0].ID) >= 2)
+                    chickenIds.Add(set.Items[0].ID);
+            int n = 0;
+            foreach (int id in items) if (chickenIds.Contains(id)) n++;
+            return n;
+        }
+
         public static ItemList Build(ItemGroup group, HashSet<int> available)
         {
             ItemList result = default;
@@ -58,7 +71,8 @@ namespace MyChickenMod
                 if (set.Items.Any(i => i != null && i.ID == _rice))
                 {
                     var choices = new List<int> { _rice };
-                    if (available.Contains(_marker)) choices.Add(_broccoli);
+                    // Bulking (2x Chicken) will Kohlenhydrate -> dann immer Reis.
+                    if (available.Contains(_marker) && CountChicken(result, group) < 2) choices.Add(_broccoli);
                     result.Add(choices[Random.Range(0, choices.Count)]);
                     continue;
                 }
