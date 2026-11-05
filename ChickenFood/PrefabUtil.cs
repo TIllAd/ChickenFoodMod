@@ -16,6 +16,8 @@ namespace MyChickenMod
         public static readonly Vector3 ChickenPos = new Vector3(0.1f, 0.09f, -0.06f);
         public static readonly Quaternion ChickenRot = Quaternion.Euler(0f, 60f, 0f);
         public const float ChickenScale = 0.75f;
+        // Zweite Portion (Bulking Season): vorne auf dem Teller, neben der ersten.
+        public static readonly Vector3 Chicken2Pos = new Vector3(0.04f, 0.12f, 0.0f); // Startwert, im Spiel nachjustieren
         public static readonly Vector3 RicePos = new Vector3(-0.1f, 0f, 0.08f);
 
         private static GameObject _holder;
@@ -91,12 +93,18 @@ namespace MyChickenMod
         }
 
         // Teller mit Hähnchen und Reis: für Icons und Anzeige im Hauptquartier.
-        public static GameObject BuildPlate(string name, CustomGameDataObject chicken)
+        public static GameObject BuildPlate(string name, CustomGameDataObject chicken,
+            bool lettuceInsteadOfRice = false, bool doubleChicken = false)
         {
             var root = CreateRoot(name);
             CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.Plate)).Prefab, root.transform, "Plate", Vector3.zero);
             AddChicken(root.transform, chicken);
-            CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.RiceContainerCooked)).Prefab, root.transform, "Rice", RicePos, 1.1f);
+            if (doubleChicken)
+                AddChicken(root.transform, chicken).transform.localPosition = Chicken2Pos;
+            if (lettuceInsteadOfRice)
+                CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.LettuceChopped)).Prefab, root.transform, "Lettuce", RicePos, 1f);
+            else
+                CloneVisual(((Item)GDOUtils.GetExistingGDO(ItemReferences.RiceContainerCooked)).Prefab, root.transform, "Rice", RicePos, 1.1f);
             return root;
         }
 

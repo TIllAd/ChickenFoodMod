@@ -14,7 +14,7 @@ namespace MyChickenMod
     {
         public const string MOD_GUID = "TillAd.PlateUp.ChickenAndRice";
         public const string MOD_NAME = "Chicken & Rice";
-        public const string MOD_VERSION = "1.0.0";
+        public const string MOD_VERSION = "1.1.0";
         public const string MOD_AUTHOR = "Till";
         public const string MOD_GAMEVERSION = ">=1.1.4";
 
@@ -38,7 +38,13 @@ namespace MyChickenMod
             // Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).FirstOrDefault() ?? throw new MissingAssetBundleException(MOD_GUID);
             Logger = InitLogger();
 
+            AddGameDataObject<RiceCoolDownProcess>();
+            AddGameDataObject<RiceBurntPot>();
+            AddGameDataObject<RiceColdPot>();
             AddGameDataObject<RiceCookedPot>();
+            AddGameDataObject<RiceCookedPotBurning>();
+            AddGameDataObject<RiceCookedPotCooling>();
+            AddGameDataObject<RiceCookedPotBurningCooling>();
             AddGameDataObject<RicePot>();
             AddGameDataObject<SteamedBroccoliPot>();
             AddGameDataObject<ChoppedBroccoliPot>();
@@ -49,6 +55,10 @@ namespace MyChickenMod
             AddGameDataObject<ChickenBroccoli_Dish>();
             AddGameDataObject<ChickenLemon_Dish>();
             AddGameDataObject<ChickenSoySauce_Dish>();
+            AddGameDataObject<LowCarb_Dish>();
+            AddGameDataObject<BulkingSeason_Dish>();
+            AddGameDataObject<BurntRiceCard>();
+            AddGameDataObject<ColdRiceCard>();
 
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 

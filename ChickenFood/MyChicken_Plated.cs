@@ -28,7 +28,12 @@ namespace MyChickenMod.Custom.Chicken
         {
             new ItemGroup.ItemSet { Min = 1, Max = 1, IsMandatory = true, Items = new List<Item> { Ref(ItemReferences.Plate) } },
             new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { ChickenItem } },
-            new ItemGroup.ItemSet { Min = 1, Max = 1, Items = new List<Item> { Ref(ItemReferences.RiceContainerCooked) } },
+            // Bulking Season: zweite Portion Chicken, nur mit Karte (dann ~50 % der Bestellungen).
+            new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true, Items = new List<Item> { ChickenItem } },
+            // Beilage: Reis (vom Grundgericht freigeschaltet) oder - mit Karte "Low Carb" - Salat statt Reis.
+            // Gleiches Muster wie die Soßen bei FryThat: Pflichtauswahl aus den freigeschalteten Zutaten.
+            new ItemGroup.ItemSet { Min = 1, Max = 1, RequiresUnlock = true,
+                Items = new List<Item> { Ref(ItemReferences.RiceContainerCooked), Ref(ItemReferences.LettuceChopped) } },
             // Toppings: nur mit freigeschalteter Karte. Getrennte Sets -> jedes Topping
             // wird unabhängig mit 50 % bestellt (0 oder 1, gleich verteilt).
             new ItemGroup.ItemSet { Min = 0, Max = 1, RequiresUnlock = true,
@@ -42,6 +47,7 @@ namespace MyChickenMod.Custom.Chicken
         {
             new ItemGroupView.ColourBlindLabel { Item = SteamedBroccoliItem, Text = "B" },
             new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LemonSliced), Text = "Le" },
+            new ItemGroupView.ColourBlindLabel { Item = Ref(ItemReferences.LettuceChopped), Text = "Sa" },
         };
 
         public override List<ItemGroup.ItemReward> Rewards => new List<ItemGroup.ItemReward>
@@ -71,20 +77,28 @@ namespace MyChickenMod.Custom.Chicken
         public override void OnRegister(ItemGroup gdo)
         {
             var chickenGO = PrefabUtil.AddChicken(Prefab.transform, ChickenCustom);
+            // Zweites Stück für Bulking Season (wird nur bei 2 Portionen angezeigt).
+            var chicken2GO = PrefabUtil.AddChicken(Prefab.transform, ChickenCustom);
+            chicken2GO.name = "Chicken 2";
+            chicken2GO.transform.localPosition = PrefabUtil.Chicken2Pos;
             var rice = Ref(ItemReferences.RiceContainerCooked);
             var riceGO = PrefabUtil.CloneVisual(rice.Prefab, Prefab.transform, "Rice", PrefabUtil.RicePos, 1.1f);
             // Topping = Portion aus unserem Brokkoli-Topf; Optik: die geschnittenen Röschen.
             var broccoli = SteamedBroccoliItem;
             var broccoliGO = PrefabUtil.CloneVisual(Ref(ItemReferences.BroccoliChopped).Prefab, Prefab.transform, "Broccoli", new Vector3(-0.1f, 0.02f, -0.12f), 0.8f);
             var lemon = Ref(ItemReferences.LemonSliced);
+            var lettuce = Ref(ItemReferences.LettuceChopped);
+            var lettuceGO = PrefabUtil.CloneVisual(lettuce.Prefab, Prefab.transform, "Lettuce", PrefabUtil.RicePos, 1f);
             var lemonGO = PrefabUtil.CloneVisual(lemon.Prefab, Prefab.transform, "Lemon", new Vector3(0.14f, 0.06f, 0.12f), 0.7f);
 
             Prefab.GetComponent<ItemGroupView>().ComponentGroups = new List<ItemGroupView.ComponentGroup>
             {
-                new ItemGroupView.ComponentGroup { Item = ChickenItem, GameObject = chickenGO },
+                // Objects ohne DrawAll: 1 Portion -> erstes Stück, 2 Portionen -> beide.
+                new ItemGroupView.ComponentGroup { Item = ChickenItem, Objects = new List<GameObject> { chickenGO, chicken2GO } },
                 new ItemGroupView.ComponentGroup { Item = rice, GameObject = riceGO },
                 new ItemGroupView.ComponentGroup { Item = broccoli, GameObject = broccoliGO },
                 new ItemGroupView.ComponentGroup { Item = lemon, GameObject = lemonGO },
+                new ItemGroupView.ComponentGroup { Item = lettuce, GameObject = lettuceGO },
             };
         }
     }
