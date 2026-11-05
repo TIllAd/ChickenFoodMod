@@ -42,7 +42,7 @@ Gelernt:
 - Brauchbare Vorlagen: **Pilz-Kostüm** = ärmelloses Oberteil + kurze Hose (→ Tanktop/Gym), **Skelett-Kostüm** = Ganzkörperanzug (Muster ist nur Textur → einfarbiger Einteiler), **Kellner** = Weste.
 - Achtung: Unterteile hängen am Elternteil (Pilzhut → Stern) – beim Löschen mitgelöscht.
 - Echte neue Formen (Tanktop, Tracksuit mit Streifen) → Blender-Weg: AssetRipper (FBX mit Skelett) → Blender → Unity-Projekt → `mod.assets`, Mesh im Code gegen Spiel-Mesh tauschen (Knochen per Namen umrechnen).
-- Selbsttest rendert alle Spiel-Outfits als Vorlage (Abschnitt „Spiel (Vorlagen)“).
+- Selbsttest (Repo PlateUp-ModSelfTest) rendert alle Spiel-Outfits als Vorlage (Abschnitt „Spiel (Vorlagen)“).
 
 ---
 
@@ -114,7 +114,7 @@ Gelernt:
 ---
 
 ## Hinweise für später
-- **Selbsttest:** `tools/ModSelfTest/run-selftest.bat` – prüft Kombinationen/Bestellungen und rendert alles. Vor jedem Release laufen lassen.
+- **Selbsttest:** `run-selftest.bat` aus dem Repo [PlateUp-ModSelfTest](https://github.com/TIllAd/PlateUp-ModSelfTest) – prüft Kombinationen/Bestellungen und rendert alles. Vor jedem Release laufen lassen.
 - **Gleiche Zutaten wie Spiel-Gerichte vermeiden** (Teller + Spiel-Item kann zu einem Spiel-Gericht werden). Lieber eigene Items mit gleicher Optik.
 - **Pflicht-Plätze schalten ihre Zutaten automatisch frei** → für optionale Extra-Portionen (Bulking) eine eigene Freischalt-Markierung nutzen.
 - **Workshop:** Seit dem Malware-Vorfall (Okt 2026) lädt PlateUp keine neu hochgeladenen Workshop-Mods (ID > 3820868888). Bis das aufgehoben ist, nur manuelle Installation.
