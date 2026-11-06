@@ -62,4 +62,22 @@ namespace MyChickenMod.Custom.Portions
 
         private static Item Ref(int id) => (Item)GDOUtils.GetExistingGDO(id);
     }
+
+    // Unsichtbare Markierung: wird von der Karte "Low Carb" freigeschaltet und von ChickenOrderPatch
+    // abgefragt. Kommt in keinem Gericht vor und wird nie bestellt.
+    public class LowCarbMarker : CustomItem
+    {
+        public override string UniqueNameID => "Low Carb Marker";
+        private GameObject _prefab;
+        public override GameObject Prefab => _prefab ??= PrefabUtil.CreateRoot("Low Carb Marker");
+    }
+
+    // Unsichtbare Markierung für "Bulking Season" (zweites Chicken). Nötig, weil das Spiel Chicken
+    // automatisch freischaltet (Pflicht-Platz) und der zweite Chicken-Platz sonst immer aktiv wäre.
+    public class BulkingMarker : CustomItem
+    {
+        public override string UniqueNameID => "Bulking Marker";
+        private GameObject _prefab;
+        public override GameObject Prefab => _prefab ??= PrefabUtil.CreateRoot("Bulking Marker");
+    }
 }

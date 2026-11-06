@@ -15,6 +15,17 @@ namespace MyChickenMod.Custom.Chicken
         public static Item Custom<T>() => (Item)GDOUtils.GetCustomGameDataObject<T>().GameDataObject;
         public static Dish BaseDish => (Dish)GDOUtils.GetCustomGameDataObject<MyChicken_Plated_Dish>().GameDataObject;
 
+        public static IEnumerable<Item> PlatedItems => new[] { Custom<MyChicken_Plated>(), Custom<ShreddedChicken_Plated>() };
+
+        // Zutat auf beiden Tellern (ganzes Stück + Geschnetzeltes) freischalten.
+        public static HashSet<Dish.IngredientUnlock> UnlockOnBoth(Item ingredient)
+        {
+            var set = new HashSet<Dish.IngredientUnlock>();
+            foreach (var plated in PlatedItems)
+                set.Add(new Dish.IngredientUnlock { MenuItem = (ItemGroup)plated, Ingredient = ingredient });
+            return set;
+        }
+
         public static (Locale, UnlockInfo) Info(string name, string desc) =>
             (Locale.English, new UnlockInfo { Name = name, Description = desc, FlavourText = "" });
     }
@@ -28,7 +39,8 @@ namespace MyChickenMod.Custom.Chicken
         public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
         public override int Difficulty => 2;
         public override bool IsAvailableAsLobbyOption => true;
-        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
+        // Grundgerichte im Spiel haben keine Kundenreduktion (nur Extras); einfaches Gericht.
+        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.None;
         public override List<string> StartingNameSet => new List<string>
         {
             "Chicken & Rice", "Rice Rice Baby", "Wing It", "Cluck & Cook", "The Rice Is Right", "Fowl Play"
@@ -43,6 +55,8 @@ namespace MyChickenMod.Custom.Chicken
             Refs.Item(ItemReferences.Water)
         };
         public override HashSet<Process> RequiredProcesses => new HashSet<Process> { Refs.Process(ProcessReferences.Cook) };
+        // Reis ist jetzt eine freischaltbare Beilage (Low Carb kann Salat danebenlegen) -> hier standardmäßig freischalten.
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.RicePortion>());
 
         public override List<Dish.MenuItem> ResultingMenuItems => new List<Dish.MenuItem>
         {
@@ -102,15 +116,7 @@ namespace MyChickenMod.Custom.Chicken
         public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
         public override List<Unlock> HardcodedRequirements => new List<Unlock> { Refs.BaseDish };
 
-        protected static IEnumerable<Item> PlatedItems => new[] { Refs.Custom<MyChicken_Plated>(), Refs.Custom<ShreddedChicken_Plated>() };
-
-        protected static HashSet<Dish.IngredientUnlock> UnlockOnBoth(Item ingredient)
-        {
-            var set = new HashSet<Dish.IngredientUnlock>();
-            foreach (var plated in PlatedItems)
-                set.Add(new Dish.IngredientUnlock { MenuItem = (ItemGroup)plated, Ingredient = ingredient });
-            return set;
-        }
+        protected static HashSet<Dish.IngredientUnlock> UnlockOnBoth(Item ingredient) => Refs.UnlockOnBoth(ingredient);
     }
 
     public class ChickenBroccoli_Dish : ChickenExtraDish
@@ -180,6 +186,72 @@ namespace MyChickenMod.Custom.Chicken
         public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
         {
             Refs.Info("Chicken - Soy Sauce", "Customers may request soy sauce with their chicken")
+        };
+    }
+
+    // ---------- Low Carb: Salat statt Reis ----------
+    public class LowCarb_Dish : CustomDish
+    {
+        public override string UniqueNameID => "ChickenLowCarb_Dish";
+        public override DishType Type => DishType.Main;
+        public override CardType CardType => CardType.Default;
+        public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
+        public override int Difficulty => 1;
+        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
+        public override List<Unlock> HardcodedRequirements => new List<Unlock> { Refs.BaseDish };
+
+        // Brokkoli aus dem eigenen Topf statt Reis. Die Karte schaltet nur eine Markierung frei;
+        // ChickenOrderPatch würfelt dann für den Beilagen-Platz Reis oder Brokkoli.
+        public override HashSet<Item> MinimumIngredients => new HashSet<Item>
+        {
+            Refs.Item(ItemReferences.BroccoliRaw), Refs.Item(ItemReferences.Pot), Refs.Item(ItemReferences.Water)
+        };
+        public override HashSet<Process> RequiredProcesses => new HashSet<Process>
+        {
+            Refs.Process(ProcessReferences.Chop), Refs.Process(ProcessReferences.Cook)
+        };
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.LowCarbMarker>());
+
+        private GameObject _icon;
+        public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildPlate("Chicken Low Carb - Icon",
+            GDOUtils.GetCustomGameDataObject<CookedChicken>(), broccoliInsteadOfRice: true);
+
+        public override Dictionary<Locale, string> Recipe => new Dictionary<Locale, string>
+        {
+            { Locale.English, "Some customers skip the carbs: serve steamed broccoli instead of rice. They may still want broccoli as a topping on top." }
+        };
+        public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
+        {
+            Refs.Info("Low Carb", "Customers may want broccoli instead of rice with their chicken")
+        };
+    }
+
+    // ---------- Bulking Season: doppelte Portion Chicken ----------
+    public class BulkingSeason_Dish : CustomDish
+    {
+        public override string UniqueNameID => "ChickenBulkingSeason_Dish";
+        public override DishType Type => DishType.Extra;
+        public override CardType CardType => CardType.Default;
+        public override UnlockGroup UnlockGroup => UnlockGroup.Dish;
+        public override int Difficulty => 2;
+        public override DishCustomerChange CustomerMultiplier => DishCustomerChange.SmallDecrease;
+        public override List<Unlock> HardcodedRequirements => new List<Unlock> { Refs.BaseDish };
+
+        // Chicken ist vom Grundgericht schon freigeschaltet (Pflicht-Platz) -> eigene Markierung,
+        // die ChickenOrderPatch für den zweiten Chicken-Platz abfragt.
+        public override HashSet<Dish.IngredientUnlock> IngredientsUnlocks => Refs.UnlockOnBoth(Refs.Custom<MyChickenMod.Custom.Portions.BulkingMarker>());
+
+        private GameObject _icon;
+        public override GameObject IconPrefab => _icon ??= PrefabUtil.BuildPlate("Chicken Bulking - Icon",
+            GDOUtils.GetCustomGameDataObject<CookedChicken>(), doubleChicken: true);
+
+        public override Dictionary<Locale, string> Recipe => new Dictionary<Locale, string>
+        {
+            { Locale.English, "Gym season! Some customers want two portions of chicken on their plate." }
+        };
+        public override List<(Locale, UnlockInfo)> InfoList => new List<(Locale, UnlockInfo)>
+        {
+            Refs.Info("Bulking Season", "Customers may order a double portion of chicken")
         };
     }
 }

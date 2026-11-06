@@ -14,7 +14,7 @@ namespace MyChickenMod
     {
         public const string MOD_GUID = "TillAd.PlateUp.ChickenAndRice";
         public const string MOD_NAME = "Chicken & Rice";
-        public const string MOD_VERSION = "1.0.1";
+        public const string MOD_VERSION = "1.1.0";
         public const string MOD_AUTHOR = "Till";
         public const string MOD_GAMEVERSION = ">=1.1.4";
 
@@ -40,6 +40,8 @@ namespace MyChickenMod
 
             AddGameDataObject<MyChickenMod.Custom.Portions.RicePortion>();
             AddGameDataObject<MyChickenMod.Custom.Portions.SteamedBroccoliPortion>();
+            AddGameDataObject<MyChickenMod.Custom.Portions.LowCarbMarker>();
+            AddGameDataObject<MyChickenMod.Custom.Portions.BulkingMarker>();
             AddGameDataObject<RiceCookedPot>();
             AddGameDataObject<RicePot>();
             AddGameDataObject<SteamedBroccoliPot>();
@@ -51,6 +53,8 @@ namespace MyChickenMod
             AddGameDataObject<ChickenBroccoli_Dish>();
             AddGameDataObject<ChickenLemon_Dish>();
             AddGameDataObject<ChickenSoySauce_Dish>();
+            AddGameDataObject<LowCarb_Dish>();
+            AddGameDataObject<BulkingSeason_Dish>();
 
             Events.BuildGameDataPreSetupEvent += (s, args) => PrefabUtil.FixMaterials();
 
